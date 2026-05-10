@@ -3,7 +3,7 @@ backend:
   repo: inclusive-materials/inclusive.materials
   branch: main
   base_url: https://sveltia-cms-auth.inclusivematerials.workers.dev
-  app_id: Ov23liwMN6HGCNEmaetv
+  app_id: Ov23liOcOoErrI70HotZ
 
 media_folder: "docs/photos"
 public_folder: "/photos"
