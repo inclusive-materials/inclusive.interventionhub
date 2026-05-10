@@ -8,6 +8,9 @@
  *
  * Blog posts also read docs/_data/blog/manifest.json (updated by CI when you push new .md files)
  * so listings still work if api.github.com is blocked (ad blockers, strict networks).
+ *
+ * Publishing (GitHub Pages): docs/.nojekyll is required so Jekyll does not strip folders whose names
+ * start with "_" — otherwise /_data/ URLs return 404 on the live site.
  */
 
 (function () {
