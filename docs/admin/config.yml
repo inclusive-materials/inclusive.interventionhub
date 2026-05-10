@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: Borderless-Expeditions/inclusive.materials
+  repo: inclusive-materials/inclusive.materials
   branch: main
   base_url: https://sveltia-cms-auth.inclusivematerials.workers.dev
   app_id: Ov23liwMN6HGCNEmaetv
