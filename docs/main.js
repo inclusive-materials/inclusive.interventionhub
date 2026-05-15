@@ -141,8 +141,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const formSuccess = document.getElementById('formSuccess');
 
 if (contactForm) {
-  contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+contactForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  grecaptcha.ready(() => {
+    grecaptcha.execute('6LdvBOssAAAAIAH-oPlqB6LgS7IOTrxSwWFeiQp', { action: 'contact' })
+    .then((token) => {
+      document.getElementById('g-recaptcha-response').value = token;
 
     const name = contactForm.querySelector('#name').value.trim();
     const email = contactForm.querySelector('#email').value.trim();
@@ -182,8 +187,10 @@ if (contactForm) {
       submitBtn.textContent = 'Send Message';
       submitBtn.disabled = false;
       alert('Something went wrong. Please try again.');
-    });
-  });
+});   // closes fetch
+      });     // closes .then (grecaptcha token)
+    });       // closes grecaptcha.ready
+  });         // closes addEventListener
 }
   /* ── Cookie consent banner (essential cookies notice) ─────── */
   try {
