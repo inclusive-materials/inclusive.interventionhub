@@ -2,7 +2,7 @@
    Inclusive Materials — style.css
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 /* ── Reset & Base ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +24,7 @@
   --shadow:      0 2px 12px rgba(0,0,0,0.07);
   --shadow-md:   0 4px 24px rgba(0,0,0,0.10);
   --transition:  0.2s ease;
-  --font-display: 'DM Serif Display', serif;
+  --font-display: 'Nunito', san-serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
 }
 
