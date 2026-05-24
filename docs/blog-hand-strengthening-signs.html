@@ -29,7 +29,9 @@
     .faq-item { border-bottom: 1px solid #e0e0e0; padding: 16px 0; }
     .faq-item h3 { font-size: 1rem; color: #1C4A30; margin-bottom: 8px; }
     .faq-item p { font-size: 0.9rem; margin: 0; }
-    .sign-number { display: inline-block; background: #1C4A30; color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; #cusdis_thread iframe { min-height: 500px !important; width: 100% !important; }
+    .sign-number { display: inline-block; background: #1C4A30; color: #fff; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;}
+    #cusdis_thread { min-height: 600px; }
+#cusdis_thread iframe { height: 600px !important; min-height: 600px !important; width: 100% !important; }
   </style>
 </head>
 <body>
@@ -271,17 +273,30 @@
 <p style="margin-top:40px; font-size:0.85rem; color:#888;">© Inclusive Materials. All rights reserved.</p>
 
 <!-- COMMENTS + REACTIONS — paste your Giscus or Disqus code here -->
-<div id="comments" style="margin-top:48px; border-top:1px solid #e0e0e0; padding-top:32px; padding-bottom:120px;">
+<div id="comments" style="margin-top:48px; border-top:1px solid #e0e0e0; padding-top:32px; padding-bottom:200px;">
   <h2 style="font-size:1.2rem; color:#1C4A30; margin-bottom:8px;">Comments & Reactions</h2>
   <p style="font-size:0.9rem; color:#888; margin-bottom:24px;">Have a question or want to share your experience? Leave a comment below.</p>
-<div id="cusdis_thread"
-  data-host="https://cusdis.com"
-  data-app-id="736d7d37-e028-45d5-b513-e0096c17d741"
-  data-page-id="blog-hand-strengthening-signs"
-  data-page-url="https://inclusivematerials.com/blog-hand-strengthening-signs.html"
-  data-page-title="5 Signs a Child Needs Hand Strengthening Activities And What To Do About It"
-></div>
-<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+  <div id="cusdis_thread"
+    data-host="https://cusdis.com"
+    data-app-id="736d7d37-e028-45d5-b513-e0096c17d741"
+    data-page-id="blog-hand-strengthening-signs"
+    data-page-url="https://inclusivematerials.com/blog-hand-strengthening-signs.html"
+    data-page-title="5 Signs a Child Needs Hand Strengthening Activities And What To Do About It"
+  ></div>
+  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+  <script>
+    function fixCusdisHeight() {
+      var iframe = document.querySelector('#cusdis_thread iframe');
+      if (iframe) {
+        iframe.style.height = '600px';
+        iframe.style.minHeight = '600px';
+        iframe.style.width = '100%';
+      } else {
+        setTimeout(fixCusdisHeight, 500);
+      }
+    }
+    setTimeout(fixCusdisHeight, 1500);
+  </script>
 </div>
   </div>
 </section>
