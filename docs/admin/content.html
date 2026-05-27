@@ -238,33 +238,188 @@
         <label>Short Description *</label>
         <textarea id="pf-desc" rows="3" placeholder="A brief description shown on the shop and home page..."></textarea>
       </div>
-      <div class="fg3">
+      <div class="fg2">
         <div class="field">
           <label>Price *</label>
           <input type="text" id="pf-price" placeholder="$4.99" />
         </div>
         <div class="field">
-          <label>Badge Label</label>
-          <input type="text" id="pf-badge" placeholder="Featured" value="Featured" />
-        </div>
-        <div class="field">
-          <label>Category</label>
-          <select id="pf-category">
-            <option value="all">All</option>
-            <option value="fine-motor">Fine Motor</option>
-            <option value="iep">IEP</option>
-            <option value="visual">Visual</option>
+          <label>Badge</label>
+          <select id="pf-badge">
+            <option value="Featured">Featured</option>
+            <option value="New">New</option>
+            <option value="Best Seller">Best Seller</option>
+            <option value="Free">Free</option>
+            <option value="Bundle">Bundle</option>
+            <option value="Sale">Sale</option>
+            <option value="OT Pick">OT Pick</option>
+            <option value="SPED Resource">SPED Resource</option>
+            <option value="Speech Resource">Speech Resource</option>
+            <option value="General Ed">General Ed</option>
           </select>
         </div>
       </div>
+
       <div class="field">
-        <label>Audience (space-separated: sped ot speech general — or leave blank for all)</label>
-        <input type="text" id="pf-audience" placeholder="sped ot" />
+        <label>Category</label>
+        <select id="pf-category">
+          <option value="all">— All Categories —</option>
+          <optgroup label="OT — Fine Motor">
+            <option value="hand strengthening">Hand Strengthening</option>
+            <option value="scissor">Scissor Skills</option>
+            <option value="pencil grasp">Pencil Grasp &amp; Control</option>
+            <option value="in-hand manipulation">In-Hand Manipulation</option>
+            <option value="bilateral coordination">Bilateral Coordination</option>
+            <option value="pre-writing">Pre-Writing Skills</option>
+            <option value="print letter">Print Letter Formation</option>
+            <option value="cursive">Cursive Writing</option>
+            <option value="spacing">Spacing &amp; Sizing</option>
+          </optgroup>
+          <optgroup label="OT — Gross Motor">
+            <option value="core strength">Core Strength &amp; Stability</option>
+            <option value="balance">Balance &amp; Coordination</option>
+            <option value="proprioception">Body Awareness (Proprioception)</option>
+            <option value="motor planning">Motor Planning</option>
+          </optgroup>
+          <optgroup label="OT — Sensory">
+            <option value="sensory awareness">Sensory Awareness</option>
+            <option value="tactile">Tactile Discrimination</option>
+            <option value="vestibular">Vestibular &amp; Movement</option>
+            <option value="visual perception">Visual Perception</option>
+            <option value="auditory processing">Auditory Processing</option>
+          </optgroup>
+          <optgroup label="OT — Visual Motor">
+            <option value="eye-hand">Eye-Hand Coordination</option>
+            <option value="copying">Copying &amp; Reproduction</option>
+            <option value="visual tracking">Visual Tracking</option>
+          </optgroup>
+          <optgroup label="OT — Self-Care">
+            <option value="dressing">Dressing Skills</option>
+            <option value="hygiene">Hygiene &amp; Grooming</option>
+            <option value="utensil">Eating &amp; Utensil Use</option>
+          </optgroup>
+          <optgroup label="OT — Executive Function">
+            <option value="attention">Attention &amp; Focus</option>
+            <option value="organization">Organization &amp; Planning</option>
+            <option value="problem solving">Problem Solving</option>
+            <option value="memory">Working Memory</option>
+          </optgroup>
+          <optgroup label="OT — Social &amp; Emotional">
+            <option value="emotion identification">Emotion Identification</option>
+            <option value="self-regulation">Self-Regulation</option>
+            <option value="social participation">Social Participation</option>
+          </optgroup>
+          <optgroup label="Speech — Articulation">
+            <option value="early developing sounds">Early Developing Sounds</option>
+            <option value="later developing sounds">Later Developing Sounds</option>
+            <option value="phonological">Phonological Processes</option>
+            <option value="minimal pair">Minimal Pair Therapy</option>
+          </optgroup>
+          <optgroup label="Speech — Language">
+            <option value="receptive language">Receptive Language</option>
+            <option value="expressive language">Expressive Language</option>
+            <option value="vocabulary">Vocabulary Building</option>
+            <option value="sentence structure">Sentence Structure</option>
+          </optgroup>
+          <optgroup label="Speech — Fluency">
+            <option value="stuttering">Stuttering Support</option>
+            <option value="smooth speech">Smooth Speech Strategies</option>
+          </optgroup>
+          <optgroup label="Speech — Social Communication">
+            <option value="pragmatic">Pragmatic Skills</option>
+            <option value="conversation">Conversation Skills</option>
+            <option value="perspective taking">Perspective Taking</option>
+          </optgroup>
+          <optgroup label="Speech — AAC">
+            <option value="core vocabulary">Core Vocabulary</option>
+            <option value="symbol-based">Symbol-Based Communication</option>
+            <option value="low-tech aac">Low-Tech AAC</option>
+          </optgroup>
+          <optgroup label="Speech — Literacy">
+            <option value="phonemic awareness">Phonemic Awareness</option>
+            <option value="phonics">Phonics</option>
+            <option value="reading fluency">Reading Fluency</option>
+          </optgroup>
+          <optgroup label="SPED — Early Intervention">
+            <option value="developmental milestones">Developmental Milestones</option>
+            <option value="early cognitive">Early Cognitive Skills</option>
+            <option value="sensory play">Sensory Play</option>
+            <option value="pre-academic">Pre-Academic Skills</option>
+          </optgroup>
+          <optgroup label="SPED — Behavior">
+            <option value="zones of regulation">Zones of Regulation</option>
+            <option value="positive behavior">Positive Behavior Supports</option>
+            <option value="emotional regulation">Emotional Regulation</option>
+          </optgroup>
+          <optgroup label="SPED — Academic Modifications">
+            <option value="reading modifications">Reading Modifications</option>
+            <option value="math modifications">Math Modifications</option>
+            <option value="written expression">Written Expression Support</option>
+          </optgroup>
+          <optgroup label="SPED — Life Skills">
+            <option value="daily living">Daily Living Skills</option>
+            <option value="community skills">Community Skills</option>
+            <option value="vocational">Vocational Readiness</option>
+          </optgroup>
+          <optgroup label="SPED — Social Skills">
+            <option value="peer interaction">Peer Interaction</option>
+            <option value="group participation">Group Participation</option>
+            <option value="conflict resolution">Conflict Resolution</option>
+          </optgroup>
+          <optgroup label="SPED — IEP &amp; Transition">
+            <option value="iep goal">IEP Goal Writing</option>
+            <option value="transition to kindergarten">Transition to Kindergarten</option>
+            <option value="post-secondary">Post-Secondary Planning</option>
+          </optgroup>
+          <optgroup label="General — Early Childhood">
+            <option value="colors shapes">Colors &amp; Shapes</option>
+            <option value="basic concepts">Basic Concepts</option>
+            <option value="early literacy">Early Literacy</option>
+            <option value="pre-writing">Pre-Writing</option>
+            <option value="number sense">Number Sense</option>
+            <option value="print awareness">Print Awareness</option>
+            <option value="social skills">Social Skills</option>
+          </optgroup>
+          <optgroup label="General — Elementary">
+            <option value="letter recognition">Letter Recognition</option>
+            <option value="sight words">Sight Words</option>
+            <option value="counting">Counting &amp; Cardinality</option>
+            <option value="reading comprehension">Reading Comprehension</option>
+            <option value="addition subtraction">Addition &amp; Subtraction</option>
+            <option value="writing sentences">Writing Sentences</option>
+            <option value="science basics">Science Basics</option>
+          </optgroup>
+        </select>
       </div>
 
       <div class="field">
-        <label>Cover Image Path</label>
+        <label>Tags — Which section of the shop should this appear in?</label>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.35rem;">
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;">
+            <input type="checkbox" id="tag-ot" value="ot" /> OT
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;">
+            <input type="checkbox" id="tag-speech" value="speech" /> Speech &amp; Language
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;">
+            <input type="checkbox" id="tag-sped" value="sped" /> SPED
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;">
+            <input type="checkbox" id="tag-general" value="general" /> General Education
+          </label>
+        </div>
+        <p style="font-size:.74rem;color:var(--muted);margin-top:.35rem;">Tick all that apply. Leave unticked to show in all sections.</p>
+      </div>
+
+      <div class="field">
+        <label>Cover Image</label>
         <input type="text" id="pf-image" placeholder="/photos/your-image.png" />
+        <div style="display:flex;align-items:center;gap:.6rem;margin-top:.5rem;flex-wrap:wrap;">
+          <label class="btn btn--teal btn--sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;">
+            ⬆ Upload Image <input type="file" id="pf-upload" accept="image/*" style="display:none;" />
+          </label>
+          <span id="upload-status" style="font-size:.78rem;color:var(--muted);"></span>
+        </div>
       </div>
       <div id="pf-photo-grid" class="photo-grid"></div>
 
@@ -583,13 +738,60 @@ async function loadBlogPosts() {
 let prodEditSha = null;
 let prodEditPath = null;
 
+// ── Image upload ──
+document.getElementById('pf-upload').addEventListener('change', async function() {
+  const file = this.files[0]; if (!file) return;
+  if (!getToken()) { document.getElementById('upload-status').textContent = '⚠ No GitHub token — go to Settings.'; return; }
+  const status = document.getElementById('upload-status');
+  status.textContent = 'Uploading…';
+  try {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      const path = `docs/photos/${file.name}`;
+      let sha = null;
+      try { sha = (await gh(`${path}?ref=${GH_BRANCH}`)).sha; } catch {}
+      const body = { message: `Upload image: ${file.name}`, content: base64, branch: GH_BRANCH };
+      if (sha) body.sha = sha;
+      await gh(path, 'PUT', body);
+      const imgPath = `/photos/${file.name}`;
+      document.getElementById('pf-image').value = imgPath;
+      status.textContent = `✓ Uploaded: ${file.name}`;
+      await loadPhotos();
+      renderPhotoGrid('pf-photo-grid', 'pf-image');
+    };
+    reader.onerror = () => { status.textContent = '⚠ Failed to read file.'; };
+    reader.readAsDataURL(file);
+  } catch(e) { status.textContent = `⚠ Upload failed: ${e.message}`; }
+});
+
+function resetTagCheckboxes() {
+  ['tag-ot','tag-speech','tag-sped','tag-general'].forEach(id => document.getElementById(id).checked = false);
+}
+function getTagsValue() {
+  const checked = ['tag-ot','tag-speech','tag-sped','tag-general']
+    .filter(id => document.getElementById(id).checked)
+    .map(id => document.getElementById(id).value);
+  return checked.length ? checked.join(' ') : 'all';
+}
+function setTagCheckboxes(audienceStr) {
+  resetTagCheckboxes();
+  if (!audienceStr || audienceStr === 'all') return;
+  audienceStr.split(/\s+/).forEach(v => {
+    const el = document.getElementById('tag-' + v.trim());
+    if (el) el.checked = true;
+  });
+}
+
 document.getElementById('new-product-btn').addEventListener('click', () => {
   prodEditSha = null; prodEditPath = null;
-  ['pf-title','pf-desc','pf-image','pf-url','pf-audience'].forEach(id => document.getElementById(id).value = '');
+  ['pf-title','pf-desc','pf-image','pf-url'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pf-price').value = '';
   document.getElementById('pf-badge').value = 'Featured';
   document.getElementById('pf-category').value = 'all';
   document.getElementById('pf-featured').checked = true;
+  document.getElementById('upload-status').textContent = '';
+  resetTagCheckboxes();
   document.getElementById('product-msg').className = 'msg';
   document.getElementById('product-form-title').textContent = 'New Product';
   renderPhotoGrid('pf-photo-grid', 'pf-image');
@@ -600,6 +802,7 @@ document.getElementById('new-product-btn').addEventListener('click', () => {
 
 function cancelProductForm() {
   document.getElementById('product-form-box').style.display = 'none';
+  resetTagCheckboxes();
   prodEditSha = null; prodEditPath = null;
 }
 
@@ -607,10 +810,10 @@ document.getElementById('save-product-btn').addEventListener('click', async () =
   const title = document.getElementById('pf-title').value.trim();
   const description = document.getElementById('pf-desc').value.trim();
   const price = document.getElementById('pf-price').value.trim();
-  const badge = document.getElementById('pf-badge').value.trim();
+  const badge = document.getElementById('pf-badge').value;
   const image = document.getElementById('pf-image').value.trim();
   const url = document.getElementById('pf-url').value.trim();
-  const audience = document.getElementById('pf-audience').value.trim() || 'all';
+  const audience = getTagsValue();
   const category = document.getElementById('pf-category').value;
   const featured = document.getElementById('pf-featured').checked;
 
@@ -644,9 +847,10 @@ window.editProduct = async function(path) {
     document.getElementById('pf-badge').value = p.badge || 'Featured';
     document.getElementById('pf-image').value = p.image || '';
     document.getElementById('pf-url').value = p.url || '';
-    document.getElementById('pf-audience').value = p.audience || 'all';
     document.getElementById('pf-category').value = p.category || 'all';
     document.getElementById('pf-featured').checked = p.featured !== false;
+    document.getElementById('upload-status').textContent = '';
+    setTagCheckboxes(p.audience || '');
     document.getElementById('product-form-title').textContent = 'Edit Product';
     document.getElementById('product-msg').className = 'msg';
     renderPhotoGrid('pf-photo-grid', 'pf-image');
