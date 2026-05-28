@@ -19,27 +19,26 @@
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
 
-    /* Header */
-    .hdr{background:var(--green);color:#fff;padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;}
-    .hdr__left{display:flex;align-items:center;gap:.75rem;}
-    .hdr h1{font-size:1.1rem;font-weight:600;}
-    .hdr a{color:#fff;opacity:.8;font-size:.82rem;text-decoration:none;}
-    .hdr a:hover{opacity:1;}
-    .hdr__btns{display:flex;align-items:center;gap:.75rem;}
-    .hdr__btns button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:.28rem .7rem;font-size:.8rem;cursor:pointer;}
+    /* ── Sidebar ── */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;background:var(--green);display:flex;flex-direction:column;z-index:100;overflow-y:auto;}
+    .sb-brand{display:flex;align-items:center;gap:.75rem;padding:1.25rem 1.1rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.12);}
+    .sb-brand img{border-radius:7px;flex-shrink:0;}
+    .sb-brand__name{font-size:.9rem;font-weight:700;line-height:1.35;color:#fff;}
+    .sb-nav{flex:1;padding:.9rem .6rem 0;}
+    .sb-label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.45);padding:.85rem .6rem .3rem;display:block;}
+    .sb-btn{display:flex;align-items:center;gap:.65rem;width:100%;padding:.6rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.75);font-size:.875rem;font-weight:500;cursor:pointer;text-align:left;transition:background .15s,color .15s;margin-bottom:.1rem;}
+    .sb-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+    .sb-btn.active{background:rgba(255,255,255,.2);color:#fff;font-weight:600;}
+    .sb-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:.6rem .6rem;}
+    .sb-links{padding:0 .6rem;}
+    .sb-link{display:flex;align-items:center;gap:.5rem;padding:.55rem .75rem;border-radius:8px;color:rgba(255,255,255,.7);font-size:.84rem;font-weight:500;text-decoration:none;transition:background .15s,color .15s;margin-bottom:.1rem;}
+    .sb-link:hover{background:rgba(255,255,255,.1);color:#fff;}
+    .sb-footer{padding:.75rem .6rem 1.25rem;margin-top:auto;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:.35rem;}
+    .sb-signout{display:flex;align-items:center;justify-content:center;gap:.45rem;width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.75);font-size:.84rem;font-weight:500;cursor:pointer;transition:all .15s;}
+    .sb-signout:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.45);}
 
-    /* Quick links */
-    .ql{background:#fff;border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;gap:.6rem;flex-wrap:wrap;}
-    .ql a{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .8rem;border-radius:6px;font-size:.8rem;font-weight:500;text-decoration:none;border:1px solid var(--border);color:var(--text);transition:all .15s;}
-    .ql a:hover{border-color:var(--teal);color:var(--green);}
-
-    /* Sub nav */
-    .subnav{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;display:flex;}
-    .subnav__btn{padding:.8rem 1.1rem;font-size:.88rem;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;color:var(--muted);background:none;transition:all .15s;}
-    .subnav__btn.active{color:var(--green);border-bottom-color:var(--teal);}
-    .subnav__btn:hover{color:var(--green);}
-
-    /* Layout */
+    /* ── Content area ── */
+    .content-wrap{margin-left:230px;min-height:100vh;background:var(--bg);}
     .main{max-width:900px;margin:0 auto;padding:2rem;}
     .section{display:none;} .section.active{display:block;}
 
@@ -119,38 +118,53 @@
     /* Divider */
     hr{border:none;border-top:1px solid var(--border);margin:1.1rem 0;}
 
-    @media(max-width:640px){.fg2,.fg3{grid-template-columns:1fr;}.main{padding:1rem;}.hdr{padding:.8rem 1rem;}.subnav{padding:0 1rem;overflow-x:auto;}}
+    @media(max-width:768px){
+      .sidebar{width:100%;height:56px;flex-direction:row;align-items:center;bottom:auto;overflow:hidden;padding:0 1rem;}
+      .sb-brand{border:none;padding:.75rem .5rem .75rem 0;}
+      .sb-brand__name{display:none;}
+      .sb-nav{display:flex;flex-direction:row;align-items:center;flex:0;padding:0;}
+      .sb-btn{padding:.4rem .6rem;font-size:.8rem;gap:.35rem;margin-bottom:0;}
+      .sb-label,.sb-divider,.sb-links,.sb-footer{display:none;}
+      .content-wrap{margin-left:0;margin-top:56px;}
+      .main{padding:1rem;}
+      .fg2,.fg3{grid-template-columns:1fr;}
+    }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="hdr">
-  <div class="hdr__left">
-    <img src="/photos/logo2.png" alt="" width="30" height="30" style="border-radius:6px;" />
-    <h1>Content Manager</h1>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <img src="/photos/logo2.png" alt="" width="32" height="32" />
+    <span class="sb-brand__name">Inclusive<br>Materials</span>
   </div>
-  <div class="hdr__btns">
-    <a href="/admin/dashboard.html">← Dashboard</a>
-    <button onclick="logout()">Sign Out</button>
+
+  <nav class="sb-nav">
+    <span class="sb-label">Content</span>
+    <button class="sb-btn active" data-sec="blog">📝 Blog Posts</button>
+    <button class="sb-btn" data-sec="products">⭐ Products</button>
+    <hr class="sb-divider" />
+    <span class="sb-label">Account</span>
+    <button class="sb-btn" data-sec="settings">⚙️ Settings</button>
+  </nav>
+
+  <hr class="sb-divider" />
+  <div class="sb-links">
+    <span class="sb-label">Quick Links</span>
+    <a href="https://analytics.google.com" target="_blank" class="sb-link">📊 Analytics</a>
+    <a href="https://payhip.com/dashboard" target="_blank" class="sb-link">💰 Payhip</a>
+    <a href="/" target="_blank" class="sb-link">↗ Live Site</a>
   </div>
-</header>
 
-<!-- QUICK LINKS -->
-<div class="ql">
-  <a href="https://analytics.google.com" target="_blank">📊 Analytics</a>
-  <a href="https://payhip.com/dashboard" target="_blank">💰 Payhip</a>
-  <a href="/" target="_blank">↗ Live Site</a>
-</div>
+  <div class="sb-footer">
+    <a href="/admin/dashboard.html" class="sb-link">← Dashboard</a>
+    <button onclick="logout()" class="sb-signout">Sign Out</button>
+  </div>
+</aside>
 
-<!-- SUB NAV -->
-<div class="subnav">
-  <button class="subnav__btn active" data-sec="blog">📝 Blog Posts</button>
-  <button class="subnav__btn" data-sec="products">⭐ Products</button>
-  <button class="subnav__btn" data-sec="settings">⚙️ Settings</button>
-</div>
-
-<!-- MAIN -->
+<!-- CONTENT -->
+<div class="content-wrap">
 <main class="main">
 
   <!-- ───────────── BLOG POSTS ───────────── -->
@@ -500,6 +514,7 @@
   </div>
 
 </main>
+</div><!-- /.content-wrap -->
 
 <script>
 const GH_REPO = 'inclusive-materials/inclusive.materials';
@@ -576,10 +591,10 @@ function selectPhoto(inputId, gridId, path, el) {
   el.classList.add('selected');
 }
 
-// ── Sub-nav ──
-document.querySelectorAll('.subnav__btn').forEach(btn => {
+// ── Sidebar nav ──
+document.querySelectorAll('.sb-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.subnav__btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('sec-' + btn.dataset.sec).classList.add('active');
