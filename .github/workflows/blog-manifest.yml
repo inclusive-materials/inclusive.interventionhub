@@ -7,9 +7,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/_data/blog/**'
-    paths-ignore:
-      - 'docs/_data/blog/manifest.json'
+      - 'docs/_data/blog/*.md'
 
 permissions:
   contents: write
