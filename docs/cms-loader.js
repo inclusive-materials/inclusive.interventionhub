@@ -665,8 +665,10 @@
         var html = posts.map(blogRowHtml).join('');
         if (html) {
           container.innerHTML = html;
-          var skeleton = document.getElementById('blog-skeleton');
-          if (skeleton) skeleton.remove();
+          // Fade in smoothly — CSS starts container at opacity:0
+          requestAnimationFrame(function () {
+            container.style.opacity = '1';
+          });
         }
       });
     } else if (base === 'blog-post.html' || base === 'blog-post') {

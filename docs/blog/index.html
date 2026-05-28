@@ -16,9 +16,9 @@
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
-    @keyframes blogPulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.5; }
+    #blog-listing-container {
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
   </style>
 </head>
@@ -65,22 +65,8 @@
 <!-- ═══════════════════════════════════════════ ARTICLES -->
 <section class="blog-list">
   <div style="max-width:860px; margin:0 auto; padding: 0 24px 80px;">
-    <div id="blog-listing-container">
-
-      <!-- skeleton shown while CMS loads; hidden once posts are injected -->
-      <div id="blog-skeleton" style="background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden; margin-bottom:32px; animation: blogPulse 1.4s ease-in-out infinite;">
-        <div style="width:100%; height:220px; background:#e9eff2;"></div>
-        <div style="padding:20px 24px;">
-          <div style="height:12px; width:40%; background:#e9eff2; border-radius:6px; margin-bottom:14px;"></div>
-          <div style="height:18px; width:85%; background:#e9eff2; border-radius:6px; margin-bottom:8px;"></div>
-          <div style="height:18px; width:60%; background:#e9eff2; border-radius:6px; margin-bottom:16px;"></div>
-          <div style="height:14px; width:95%; background:#e9eff2; border-radius:6px; margin-bottom:6px;"></div>
-          <div style="height:14px; width:70%; background:#e9eff2; border-radius:6px; margin-bottom:20px;"></div>
-          <div style="height:36px; width:130px; background:#e9eff2; border-radius:8px;"></div>
-        </div>
-      </div>
-
-    </div>
+    <div id="blog-listing-container"></div>
+  </div>
 </section>
 
 <!-- ═══════════════════════════════════════════ FOOTER -->
