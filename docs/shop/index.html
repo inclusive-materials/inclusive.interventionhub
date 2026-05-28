@@ -760,7 +760,9 @@
       var cardAudience = (card.getAttribute('data-audience') || '').toLowerCase();
       var cardTags = (card.getAttribute('data-tags') || '').toLowerCase();
       var title = (card.querySelector('h3') ? card.querySelector('h3').textContent : '').toLowerCase();
-      var audienceMatch = audience === 'all' || cardAudience === audience;
+      // Support single-value ("ot") AND multi-value ("ot speech") audience strings
+      var audienceMatch = audience === 'all' || cardAudience === 'all' ||
+        cardAudience.split(/\s+/).indexOf(audience) !== -1;
       var tagMatch = !tag || cardTags.indexOf(tag) !== -1 || title.indexOf(tag) !== -1;
       var show = audienceMatch && tagMatch;
       card.style.display = show ? '' : 'none';

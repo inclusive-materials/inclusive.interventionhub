@@ -173,7 +173,10 @@
     var r = normalizeResource(resource);
     if (!r || !r.title) return '';
 
+    // audience can be a single value ("ot") or space-separated multi-value ("ot speech")
     var aud = String(r.audience || 'all').toLowerCase().trim();
+    // Use the first listed audience for chip colour; full string goes into data-audience
+    var primaryAud = aud.split(/\s+/)[0] || 'all';
     var cat = String(r.category || 'all').toLowerCase().trim();
     var titleLower = r.title.toLowerCase();
     var searchTags = String(r.searchTags || '').toLowerCase();
@@ -205,13 +208,13 @@
 
     // ── Audience / category tag chips ──────────────────────────────────────
     var audLabel, chipStyle;
-    if (aud === 'speech') {
+    if (primaryAud === 'speech') {
       audLabel = 'Speech &amp; Language';
       chipStyle = 'background:#E8F5E9; color:#2E7D32;';
-    } else if (aud === 'ot') {
+    } else if (primaryAud === 'ot') {
       audLabel = 'OT';
       chipStyle = 'background:#E0F2F1; color:#00695C;';
-    } else if (aud === 'sped') {
+    } else if (primaryAud === 'sped') {
       audLabel = 'SPED';
       chipStyle = 'background:#FFF3E0; color:#E65100;';
     } else {
