@@ -268,6 +268,7 @@
         <div class="field">
           <label>Badge</label>
           <select id="pf-badge">
+            <option value="">— No Badge —</option>
             <option value="Featured">Featured</option>
             <option value="New">New</option>
             <option value="Best Seller">Best Seller</option>
@@ -275,9 +276,9 @@
             <option value="Bundle">Bundle</option>
             <option value="Sale">Sale</option>
             <option value="OT Pick">OT Pick</option>
-            <option value="SPED Resource">SPED Resource</option>
-            <option value="Speech Resource">Speech Resource</option>
-            <option value="General Ed">General Ed</option>
+            <option value="SLP Pick">SLP Pick</option>
+            <option value="SPED Pick">SPED Pick</option>
+            <option value="Gen Ed Pick">Gen Ed Pick</option>
           </select>
         </div>
         <div class="field">
@@ -918,7 +919,7 @@ window.editProduct = async function(path) {
     document.getElementById('pf-desc').value = p.description || '';
     document.getElementById('pf-price').value = p.price || '';
     document.getElementById('pf-original-price').value = p.originalPrice || '';
-    document.getElementById('pf-badge').value = p.badge || 'Featured';
+    document.getElementById('pf-badge').value = p.badge || '';
     document.getElementById('pf-level').value = p.level || '';
     document.getElementById('pf-image').value = p.image || '';
     document.getElementById('pf-url').value = p.url || '';
