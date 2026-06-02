@@ -1447,6 +1447,8 @@ document.getElementById('save-product-btn').addEventListener('click', async () =
   if (originalPrice) payload.originalPrice = originalPrice;
   if (level) payload.level = level;
   Object.assign(payload, { badge, image, url, featured, audience, category, searchTags });
+  if (!prodEditSha) payload.createdAt = new Date().toISOString().slice(0, 10);
+  else { try { const { content } = await cmsReadFile(path); const existing = JSON.parse(content); if (existing.createdAt) payload.createdAt = existing.createdAt; } catch {} }
   showCMSMsg('product-msg','Saving…','info');
   try {
     await cmsWriteFile(path, JSON.stringify(payload, null, 2), `${prodEditSha ? 'Update' : 'Add'} product: ${title}`, prodEditSha);
@@ -1506,14 +1508,20 @@ async function loadProducts() {
       try {
         const { content } = await cmsReadFile(`docs/_data/resources/${f.name}`);
         const p = JSON.parse(content);
-        return { name: f.name, path: `docs/_data/resources/${f.name}`, title: p.title || f.name, price: p.price || '', featured: p.featured !== false };
-      } catch { return { name: f.name, path: `docs/_data/resources/${f.name}`, title: f.name, price: '', featured: true }; }
+        return { name: f.name, path: `docs/_data/resources/${f.name}`, title: p.title || f.name, price: p.price || '', featured: p.featured !== false, createdAt: p.createdAt || '' };
+      } catch { return { name: f.name, path: `docs/_data/resources/${f.name}`, title: f.name, price: '', featured: true, createdAt: '' }; }
     }));
+    products.sort((a, b) => {
+      if (a.createdAt && b.createdAt) return b.createdAt.localeCompare(a.createdAt);
+      if (a.createdAt) return -1;
+      if (b.createdAt) return 1;
+      return b.name.localeCompare(a.name);
+    });
     el.innerHTML = products.map(p => `
       <div class="item">
         <div class="item__info">
           <div class="item__title">${p.title}</div>
-          <div class="item__meta">${p.price} &nbsp;·&nbsp; ${p.featured ? '<span style="color:#16a34a">Featured on homepage</span>' : 'Not featured'}</div>
+          <div class="item__meta">${p.price} &nbsp;·&nbsp; ${p.createdAt ? `<span style="color:#6b7280">Added ${p.createdAt}</span> &nbsp;·&nbsp; ` : ''}${p.featured ? '<span style="color:#16a34a">Featured on homepage</span>' : 'Not featured'}</div>
         </div>
         <div class="item__actions">
           <button class="btn btn--outline btn--sm" onclick="editProduct('${p.path}')">Edit</button>
