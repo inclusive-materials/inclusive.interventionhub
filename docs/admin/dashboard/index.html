@@ -1370,12 +1370,13 @@ let prodEditSha = null, prodEditPath = null;
 
 document.getElementById('pf-upload').addEventListener('change', async function() {
   const file = this.files[0]; if (!file) return;
+  this.value = '';
   if (!getCMSToken()) { document.getElementById('upload-status').textContent = '⚠ No token — open CMS Settings.'; return; }
   const status = document.getElementById('upload-status');
   status.textContent = 'Uploading…';
-  try {
-    const reader = new FileReader();
-    reader.onload = async () => {
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
       const base64 = reader.result.split(',')[1];
       const path = `docs/photos/${file.name}`;
       let sha = null;
@@ -1387,10 +1388,10 @@ document.getElementById('pf-upload').addEventListener('change', async function()
       status.textContent = `✓ Uploaded: ${file.name}`;
       await loadCMSPhotos();
       renderPhotoGrid('pf-photo-grid', 'pf-image');
-    };
-    reader.onerror = () => { status.textContent = '⚠ Failed to read file.'; };
-    reader.readAsDataURL(file);
-  } catch(e) { status.textContent = `⚠ Upload failed: ${e.message}`; }
+    } catch(e) { status.textContent = `⚠ Upload failed: ${e.message}`; }
+  };
+  reader.onerror = () => { status.textContent = '⚠ Failed to read file.'; };
+  reader.readAsDataURL(file);
 });
 
 function resetTagCheckboxes() { ['tag-ot','tag-speech','tag-sped','tag-general'].forEach(id => document.getElementById(id).checked = false); }
