@@ -591,6 +591,15 @@
 
     if (loading) loading.classList.add('hidden');
     if (content) content.classList.remove('hidden');
+
+    // Initialise Cusdis with the current post's info
+    var cusdisEl = document.getElementById('cusdis_thread');
+    if (cusdisEl) {
+      cusdisEl.setAttribute('data-page-id', post.slug || slug);
+      cusdisEl.setAttribute('data-page-url', window.location.href);
+      cusdisEl.setAttribute('data-page-title', post.title || '');
+      if (window.CUSDIS) window.CUSDIS.initial();
+    }
   }
 
   function loadHomepage() {
