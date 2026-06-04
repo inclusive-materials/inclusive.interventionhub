@@ -545,7 +545,7 @@
       }
     }
     slug = String(slug).trim();
-    if (/[\/\\]|\.\.|/.test(slug)) slug = '';
+    if (/[\/\\]|\.\./.test(slug)) slug = '';
 
     var loading = document.getElementById('blog-post-loading');
     var content = document.getElementById('blog-post-content');
@@ -722,7 +722,7 @@
       var legacyHash = window.location.hash.replace(/^#/, '');
       if (legacyHash.indexOf('post-') === 0) {
         var legacySlug = legacyHash.slice('post-'.length).trim();
-        if (legacySlug && !/[\/\\]|\.\.|/.test(legacySlug)) {
+        if (legacySlug && !/[\/\\]|\.\./.test(legacySlug)) {
           window.location.replace('./blog-post.html?post=' + encodeURIComponent(legacySlug));
           return;
         }
