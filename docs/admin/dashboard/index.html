@@ -1503,7 +1503,7 @@ async function loadProducts() {
   el.innerHTML = '<div class="cm-empty">Loading…</div>';
   try {
     const files = await cmsListFiles('docs/_data/resources');
-    const jsonFiles = files.filter(f => f.name.endsWith('.json')).reverse();
+    const jsonFiles = files.filter(f => f.name.endsWith('.json') && f.name !== 'manifest.json').reverse();
     if (!jsonFiles.length) { el.innerHTML = '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>'; return; }
     const products = await Promise.all(jsonFiles.map(async f => {
       try {
@@ -1513,10 +1513,14 @@ async function loadProducts() {
       } catch { return { name: f.name, path: `docs/_data/resources/${f.name}`, title: f.name, price: '', featured: true, createdAt: '' }; }
     }));
     products.sort((a, b) => {
-      if (a.createdAt && b.createdAt) return b.createdAt.localeCompare(a.createdAt);
+      if (a.createdAt && b.createdAt) {
+        const d = b.createdAt.localeCompare(a.createdAt);
+        if (d !== 0) return d;
+        return a.name.localeCompare(b.name);
+      }
       if (a.createdAt) return -1;
       if (b.createdAt) return 1;
-      return b.name.localeCompare(a.name);
+      return a.name.localeCompare(b.name);
     });
     el.innerHTML = products.map(p => `
       <div class="item">
