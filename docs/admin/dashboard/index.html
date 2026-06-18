@@ -523,9 +523,13 @@
 
   <!-- ─────────────── PRODUCT LISTING ─────────────── -->
   <div id="tab-products" class="tab-panel">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
       <h2 style="font-size:1.05rem;font-weight:700;color:var(--green);">Product Listing</h2>
       <button class="btn btn--primary" id="new-product-btn">+ New Product</button>
+    </div>
+    <div style="margin-bottom:1.25rem;position:relative;">
+      <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#90a89a" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#90a89a" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input id="product-search" type="text" placeholder="Search products…" oninput="filterProductList(this.value)" style="width:100%;padding:.45rem .75rem .45rem 2rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;outline:none;box-sizing:border-box;" />
     </div>
     <div class="box" id="product-form-box" style="display:none;">
       <h2 id="product-form-title">New Product</h2>
@@ -1614,6 +1618,13 @@ window.deleteProduct = async function(path, title) {
   } catch(e) { alert(`Error: ${e.message}`); }
 };
 
+function filterProductList(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('#product-list .product-list-item').forEach(function(item) {
+    item.style.display = (!q || item.dataset.search.includes(q)) ? '' : 'none';
+  });
+}
+
 async function loadProducts() {
   const el = document.getElementById('product-list');
   if (!getCMSToken()) {
@@ -1636,8 +1647,9 @@ async function loadProducts() {
       if (d !== 0) return d;
       return b.name.localeCompare(a.name);
     });
+    const searchQuery = (document.getElementById('product-search')?.value || '').toLowerCase().trim();
     el.innerHTML = products.map(p => `
-      <div class="item">
+      <div class="item product-list-item" data-search="${(p.title + ' ' + p.name).toLowerCase()}">
         <div class="item__info">
           <div class="item__title">${p.title}</div>
           <div class="item__meta">${p.price} &nbsp;·&nbsp; ${p.createdAt ? `<span style="color:#6b7280">Added ${p.createdAt.slice(0,10)}</span> &nbsp;·&nbsp; ` : ''}${p.featured ? '<span style="color:#16a34a">Featured on homepage</span>' : 'Not featured'}</div>
@@ -1647,6 +1659,7 @@ async function loadProducts() {
           <button class="btn btn--danger btn--sm" onclick="deleteProduct('${p.path}','${p.title.replace(/'/g,"\\'")}')">Delete</button>
         </div>
       </div>`).join('');
+    if (searchQuery) filterProductList(searchQuery);
   } catch(e) {
     if (e.message === 'Not Found' || e.message.includes('404')) {
       el.innerHTML = '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>';
