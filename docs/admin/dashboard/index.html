@@ -1564,7 +1564,11 @@ document.getElementById('save-product-btn').addEventListener('click', async () =
   }
   showCMSMsg('product-msg','Saving…','info');
   try {
-    await cmsWriteFile(path, JSON.stringify(payload, null, 2), `${prodEditSha ? 'Update' : 'Add'} product: ${title}`, prodEditSha);
+    let saveSha = prodEditSha;
+    if (prodEditPath) {
+      try { saveSha = (await cmsReadFile(prodEditPath)).sha; } catch {}
+    }
+    await cmsWriteFile(path, JSON.stringify(payload, null, 2), `${saveSha ? 'Update' : 'Add'} product: ${title}`, saveSha);
     await updateResourceManifest(filename);
     showCMSMsg('product-msg','✓ Product saved! Site updates in ~1 min.','ok');
     cancelProductForm(); loadProducts();
