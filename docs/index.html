@@ -110,11 +110,13 @@
 
 <!-- ═══════════════════════════════════════════ WHAT WE OFFER -->
 <style>
-.offer-section { padding: 80px 24px; background: var(--surface); }
+/* ── Offer section wrapper ─────────────────── */
+.offer-section { padding: 80px 24px 0; background: var(--surface); }
 .offer-section__header { text-align: center; margin-bottom: 48px; }
 .offer-section__header h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 12px; }
 .offer-section__header p { color: var(--text-muted); max-width: 480px; margin: 0 auto; }
 
+/* ── 3-card row ────────────────────────────── */
 .offer-grid {
   max-width: 1060px;
   margin: 0 auto;
@@ -127,236 +129,260 @@
   background: var(--bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  overflow: hidden;
+  padding: 28px 28px 24px;
   display: flex;
   flex-direction: column;
-  transition: box-shadow var(--transition), transform var(--transition);
+  gap: 12px;
+  cursor: default;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border-bottom: 3px solid transparent;
 }
+.offer-card.is-active,
 .offer-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
+.offer-card.is-active { border-bottom-color: var(--green-light); border-radius: var(--radius) var(--radius) 0 0; }
 
 .offer-card--articles { border-top: 4px solid var(--green-light); }
 .offer-card--resources { border-top: 4px solid var(--green-mid); }
 .offer-card--services  { border-top: 4px solid var(--green-dark); }
 
-.offer-card__top { padding: 28px 28px 20px; }
-
 .offer-card__icon {
-  width: 48px;
-  height: 48px;
+  width: 48px; height: 48px;
   background: var(--green-pale);
   border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   color: var(--green-light);
-  margin-bottom: 16px;
 }
-
-.offer-card h3 { font-size: 1.1rem; margin-bottom: 10px; }
-.offer-card__top > p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
-
-/* Expand area */
-.offer-card__expand {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  opacity: 0;
-}
-.offer-card:hover .offer-card__expand {
-  max-height: 420px;
-  opacity: 1;
-}
-
-.offer-card__expand-inner {
-  border-top: 1px solid rgba(0,0,0,0.07);
-  margin: 0 28px;
-  padding: 16px 0 26px;
-}
-
-.offer-expand-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  transition: color var(--transition);
-}
-.offer-expand-row:last-of-type { border-bottom: none; }
-.offer-expand-row:hover { color: var(--green-dark); }
-
-.offer-expand-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.offer-expand-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.83rem;
+.offer-card h3 { font-size: 1.1rem; }
+.offer-card > p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; flex: 1; }
+.offer-card__hint {
+  font-size: 0.78rem;
+  color: var(--green-light);
   font-weight: 600;
-  color: var(--green-dark);
-  text-decoration: none;
-  margin-top: 12px;
-  transition: color var(--transition);
+  opacity: 0;
+  transition: opacity 0.2s;
 }
-.offer-expand-link:hover { color: var(--green-light); }
+.offer-card:hover .offer-card__hint { opacity: 1; }
 
-.offer-expand-service { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.offer-expand-service:last-of-type { border-bottom: none; }
-.offer-expand-service strong { display: block; font-size: 0.83rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.offer-expand-service span { font-size: 0.77rem; color: var(--text-muted); }
+/* ── Large reveal panels ───────────────────── */
+.offer-panels {
+  max-width: 1060px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
 
+.offer-panel {
+  display: none;
+  background: var(--bg);
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 32px 32px 36px;
+  animation: panelReveal 0.28s ease;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.offer-panel.is-active { display: block; }
+
+@keyframes panelReveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.offer-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.offer-panel__header h3 { font-size: 1.05rem; color: var(--text); }
+.offer-panel__header a { font-size: 0.85rem; font-weight: 600; color: var(--green-dark); text-decoration: none; }
+.offer-panel__header a:hover { color: var(--green-light); }
+
+/* Services panel grid */
+.panel-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.panel-service-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 3px solid var(--green-light);
+}
+.panel-service-card h4 { font-size: 0.95rem; font-family: var(--font-body); font-weight: 700; }
+.panel-service-card p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.6; flex: 1; }
+.panel-service-card a { font-size: 0.82rem; font-weight: 600; color: var(--green-dark); text-decoration: none; }
+.panel-service-card a:hover { color: var(--green-light); }
+
+/* Bottom padding after panels */
+.offer-section-end { padding-bottom: 80px; background: var(--surface); }
+
+/* Mobile: all panels always visible, no hover */
 @media (max-width: 860px) {
   .offer-grid { grid-template-columns: 1fr; }
-  .offer-card__expand { max-height: none !important; opacity: 1 !important; }
-  .offer-card:hover { transform: none; }
+  .offer-card { border-radius: var(--radius) !important; border-bottom: none !important; transform: none !important; }
+  .offer-panels { box-shadow: none; }
+  .offer-panel { display: block !important; animation: none; border-radius: var(--radius); margin-top: 16px; }
+  .offer-card__hint { display: none; }
+  .panel-services-grid { grid-template-columns: 1fr; }
 }
 </style>
 
-<section class="offer-section">
+<section class="offer-section" id="offerSection">
   <div class="offer-section__header container">
     <h2>What We Offer</h2>
     <p>From downloadable resources to hands-on expert support — everything designed to help every learner thrive.</p>
   </div>
 
-  <div class="offer-grid">
+  <div class="offer-grid" id="offerGrid">
 
     <!-- ARTICLES & TIPS -->
-    <div class="offer-card offer-card--articles">
-      <div class="offer-card__top">
-        <div class="offer-card__icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 19V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12" stroke="currentColor" stroke-width="1.5"/><path d="M2 19h18M9 5V3M13 5V3M8 10h6M8 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Articles &amp; Tips</h3>
-        <p>Evidence-informed blog posts on fine motor development, classroom adaptations, and sensory-friendly strategies.</p>
+    <div class="offer-card offer-card--articles" data-panel="panel-articles">
+      <div class="offer-card__icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 19V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12" stroke="currentColor" stroke-width="1.5"/><path d="M2 19h18M9 5V3M13 5V3M8 10h6M8 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
-      <div class="offer-card__expand">
-        <div class="offer-card__expand-inner">
-          <a href="/blog-hand-strengthening-signs/" style="display:flex; gap:12px; align-items:flex-start; text-decoration:none; margin-bottom:14px;">
-            <img src="./photos/blog-hand-strengthening-hero.jpg" alt="" style="width:64px; height:48px; object-fit:cover; border-radius:6px; flex-shrink:0;" />
-            <div>
-              <span style="font-size:0.69rem; font-weight:700; color:var(--green-light); text-transform:uppercase; letter-spacing:0.06em;">Fine Motor · OT</span>
-              <p style="font-size:0.81rem; font-weight:600; color:var(--text); line-height:1.4; margin-top:3px;">5 Signs a Child Needs Hand Strengthening Activities</p>
-            </div>
-          </a>
-          <a href="/blog/" class="offer-expand-link">View all articles →</a>
-        </div>
-      </div>
+      <h3>Articles &amp; Tips</h3>
+      <p>Evidence-informed blog posts on fine motor development, classroom adaptations, and sensory-friendly strategies.</p>
+      <span class="offer-card__hint">Hover to see latest articles ↓</span>
     </div>
 
     <!-- DIGITAL RESOURCES -->
-    <div class="offer-card offer-card--resources">
-      <div class="offer-card__top">
-        <div class="offer-card__icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 4h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h6M8 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Digital Resources</h3>
-        <p>Printable activity packs, worksheets, and visual supports you can download and use in your classroom tomorrow.</p>
+    <div class="offer-card offer-card--resources" data-panel="panel-resources">
+      <div class="offer-card__icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 4h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h6M8 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
-      <div class="offer-card__expand">
-        <div class="offer-card__expand-inner">
-          <a href="/shop/?cat=ot" class="offer-expand-row">
-            <span class="offer-expand-dot" style="background:#2196F3;"></span> OT Resources
-          </a>
-          <a href="/shop/?cat=sped" class="offer-expand-row">
-            <span class="offer-expand-dot" style="background:#FF9800;"></span> SPED
-          </a>
-          <a href="/shop/?cat=speech" class="offer-expand-row">
-            <span class="offer-expand-dot" style="background:#4CAF50;"></span> Speech &amp; Language
-          </a>
-          <a href="/shop/?cat=general" class="offer-expand-row">
-            <span class="offer-expand-dot" style="background:#9C27B0;"></span> General Classroom
-          </a>
-          <a href="/shop/" class="offer-expand-link">Browse all resources →</a>
-        </div>
-      </div>
+      <h3>Digital Resources</h3>
+      <p>Printable activity packs, worksheets, and visual supports you can download and use in your classroom tomorrow.</p>
+      <span class="offer-card__hint">Hover to browse resources ↓</span>
     </div>
 
     <!-- EXPERT SERVICES -->
-    <div class="offer-card offer-card--services">
-      <div class="offer-card__top">
-        <div class="offer-card__icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M15 19v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M21 19v-2a4 4 0 0 0-3-3.87M14 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Expert Services</h3>
-        <p>Personalized consultation, parent &amp; teacher coaching, and direct intervention support from a specialist.</p>
+    <div class="offer-card offer-card--services" data-panel="panel-services">
+      <div class="offer-card__icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M15 19v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M21 19v-2a4 4 0 0 0-3-3.87M14 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
-      <div class="offer-card__expand">
-        <div class="offer-card__expand-inner">
-          <div class="offer-expand-service">
-            <strong>Consultation</strong>
-            <span>IEP guidance, assessments &amp; strategy sessions</span>
+      <h3>Expert Services</h3>
+      <p>Personalized consultation, parent &amp; teacher coaching, and direct intervention support from a specialist.</p>
+      <span class="offer-card__hint">Hover to explore services ↓</span>
+    </div>
+
+  </div>
+
+  <!-- ── REVEAL PANELS ── -->
+  <div class="offer-panels" id="offerPanels">
+
+    <!-- Articles panel -->
+    <div class="offer-panel" id="panel-articles">
+      <div class="offer-panel__header">
+        <h3>Latest Articles</h3>
+        <a href="/blog/">View all articles →</a>
+      </div>
+      <div style="background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden; max-width:780px;">
+        <img src="./photos/blog-hand-strengthening-hero.jpg" alt="5 Signs a Child Needs Hand Strengthening Activities" style="width:100%; height:260px; object-fit:cover; object-position:center;" />
+        <div style="padding:24px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+            <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">OT</span>
+            <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">Fine Motor</span>
+            <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">Hand Strengthening</span>
           </div>
-          <div class="offer-expand-service">
-            <strong>Parent &amp; Teacher Coaching</strong>
-            <span>Ongoing skill-building for the adults supporting learners</span>
+          <h3 style="font-size:1.2rem; font-weight:700; color:#1C4A30; margin-bottom:10px; line-height:1.4;">5 Signs a Child Needs Hand Strengthening Activities And What To Do About It</h3>
+          <p style="font-size:0.9rem; color:#546E7A; margin-bottom:18px; line-height:1.6;">Many children who avoid writing tasks are not being difficult. Their hands simply are not ready yet. Here are five signs to watch for and what actually helps.</p>
+          <a href="/blog-hand-strengthening-signs/" style="display:inline-block; background:#1C4A30; color:#fff; padding:10px 20px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Read Article →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Resources panel -->
+    <div class="offer-panel" id="panel-resources">
+      <div class="offer-panel__header">
+        <h3>Featured Resources</h3>
+        <a href="/shop/">View all resources →</a>
+      </div>
+      <div id="featured-resources-container" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px;"></div>
+    </div>
+
+    <!-- Expert Services panel -->
+    <div class="offer-panel" id="panel-services">
+      <div class="offer-panel__header">
+        <h3>Our Services</h3>
+        <a href="/services/">View all services →</a>
+      </div>
+      <div class="panel-services-grid">
+        <div class="panel-service-card">
+          <div style="width:40px;height:40px;background:var(--green-pale);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
           </div>
-          <div class="offer-expand-service">
-            <strong>Intervention Support</strong>
-            <span>Structured, IEP-aligned direct support for learners</span>
+          <h4>Consultation</h4>
+          <p>One-on-one expert sessions for IEP planning, learner assessments, and classroom strategies tailored to your situation.</p>
+          <a href="/services/#consultation">Book a Consultation →</a>
+        </div>
+        <div class="panel-service-card">
+          <div style="width:40px;height:40px;background:var(--green-pale);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
-          <a href="/services/" class="offer-expand-link">View all services →</a>
+          <h4>Parent &amp; Teacher Coaching</h4>
+          <p>Ongoing coaching sessions that build your confidence and skills to better support the learners in your care.</p>
+          <a href="/services/#coaching">Start Coaching →</a>
+        </div>
+        <div class="panel-service-card">
+          <div style="width:40px;height:40px;background:var(--green-pale);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h4>Intervention Support</h4>
+          <p>Direct, structured support with individualized plans, progress monitoring, and IEP-aligned strategies for learners.</p>
+          <a href="/services/#intervention">Explore Support →</a>
         </div>
       </div>
     </div>
 
   </div>
+  <div class="offer-section-end"></div>
 </section>
 
-<!-- ═══════════════════════════════════════════ FEATURED RESOURCES -->
-<section class="featured-resources" style="padding-top:60px;">
-<div class="container">
-  <div class="section-row">
-    <div class="section-row__left">
-      <h2>Featured Resources</h2>
-      <p>Ready-to-use materials for your classroom or therapy sessions.</p>
-    </div>
-    <a href="/shop/" class="view-all">View all →</a>
-  </div>
-<div id="featured-resources-container" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; margin-top:24px;"></div>
-</div>
-</section>
-  
-<!-- ═══════════════════════════════════════════ LATEST ARTICLES -->
-<section class="latest-articles" style="padding-top:60px; background:#FFFFFF;">
-  <div class="container" style="margin-bottom:30px;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <h2 style="font-size:1.8rem; color:#1C4A30; margin-bottom:8px;">Latest Articles</h2>
-        <p style="color:#5A6E65;">Tips, strategies, and insights from the classroom.</p>
-      </div>
-      <a href="/blog/" class="view-all" style="color:#1C4A30;">View all →</a>
-    </div>
-  </div>
-<div style="max-width:860px; margin:0 auto; padding:0 24px;">
-  <div style="background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden;">
-    <img
-      src="photos/blog-hand-strengthening-hero.jpg"
-      alt="5 Signs a Child Needs Hand Strengthening Activities"
-      style="width:100%; height:260px; object-fit:cover; object-position:center;"
-    />
-    <div style="padding:24px;">
-      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
-        <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">OT</span>
-        <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">Fine Motor</span>
-        <span style="background:#E0F2F1; color:#00695C; font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;">Hand Strengthening</span>
-      </div>
-      <h3 style="font-size:1.2rem; font-weight:700; color:#1C4A30; margin-bottom:10px; line-height:1.4;">5 Signs a Child Needs Hand Strengthening Activities And What To Do About It</h3>
-      <p style="font-size:0.9rem; color:#546E7A; margin-bottom:18px; line-height:1.6;">Many children who avoid writing tasks are not being difficult. Their hands simply are not ready yet. Here are five signs to watch for and what actually helps.</p>
-      <a href="/blog-hand-strengthening-signs/" style="display:inline-block; background:#1C4A30; color:#fff; padding:10px 20px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Read Article →</a>
-    </div>
-  </div>
-</div>
-</section>
+<script>
+(function() {
+  var cards = document.querySelectorAll('.offer-card[data-panel]');
+  var panels = document.querySelectorAll('.offer-panel');
+  var panelsEl = document.getElementById('offerPanels');
+  var hideTimer = null;
+
+  function showPanel(panelId) {
+    clearTimeout(hideTimer);
+    panels.forEach(function(p) { p.classList.remove('is-active'); });
+    cards.forEach(function(c) { c.classList.remove('is-active'); });
+    var panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('is-active');
+    var card = document.querySelector('[data-panel="' + panelId + '"]');
+    if (card) card.classList.add('is-active');
+  }
+
+  function scheduleHide() {
+    hideTimer = setTimeout(function() {
+      panels.forEach(function(p) { p.classList.remove('is-active'); });
+      cards.forEach(function(c) { c.classList.remove('is-active'); });
+    }, 180);
+  }
+
+  cards.forEach(function(card) {
+    card.addEventListener('mouseenter', function() {
+      showPanel(card.dataset.panel);
+    });
+    card.addEventListener('mouseleave', scheduleHide);
+  });
+
+  panelsEl.addEventListener('mouseenter', function() {
+    clearTimeout(hideTimer);
+  });
+  panelsEl.addEventListener('mouseleave', scheduleHide);
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ CTA BANNER -->
 <section class="cta-banner">
