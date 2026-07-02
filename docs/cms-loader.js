@@ -633,7 +633,11 @@
     var feat = document.getElementById('featured-resources-container');
     if (feat) {
       resourcesPromise.then(function (resources) {
-        if (!resources.length) return;
+        var section = document.getElementById('homepage-resources-section');
+        if (!resources.length) {
+          if (section) section.style.display = 'none';
+          return;
+        }
         var featured = resources.filter(function (r) {
           return normalizeResource(r).featured;
         });
@@ -715,16 +719,25 @@
 
   async function syncResourcesNav() {
     var dropdown = document.getElementById('shopDropdown');
-    if (!dropdown) return;
+    var footerItem = document.getElementById('footerResourcesLi');
+    if (!dropdown && !footerItem) return;
     var resources = await loadResources();
-    if (!resources.length) dropdown.style.display = 'none';
+    if (!resources.length) {
+      if (dropdown) dropdown.style.display = 'none';
+    } else if (footerItem) {
+      footerItem.style.display = '';
+    }
   }
 
   async function syncBlogNav() {
     var navItem = document.getElementById('navBlogLi');
-    if (!navItem) return;
+    var footerItem = document.getElementById('footerBlogLi');
+    if (!navItem && !footerItem) return;
     var posts = await loadBlogPostsParsed();
-    if (posts.length) navItem.style.display = '';
+    if (posts.length) {
+      if (navItem) navItem.style.display = '';
+      if (footerItem) footerItem.style.display = '';
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
