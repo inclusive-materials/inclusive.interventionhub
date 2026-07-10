@@ -237,8 +237,12 @@
     if (r.previewFile) {
       previewHtml =
         '<a href="' + escapeHtml(r.previewFile) + '" target="_blank"' +
-        ' style="background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:8px 16px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Preview ↗</a>';
+        ' style="flex:1; text-align:center; background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:8px 12px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Preview ↗</a>';
     }
+
+    // ── Description — clean intro only, no raw "✅ item" checklist clutter ──
+    var introText = parseResourceHighlights(r.description).intro || r.description;
+    if (introText.length > 140) introText = introText.slice(0, 137).trim() + '…';
 
     return (
       '<div class="product-card"' +
@@ -253,14 +257,12 @@
       '</div>' +
       '<div style="padding:16px;">' +
       '<h3 style="font-size:1rem; font-weight:700; color:#1C4A30; margin-bottom:6px; line-height:1.4;">' + escapeHtml(r.title) + '</h3>' +
-      '<p style="font-size:0.85rem; color:#546E7A; margin-bottom:12px; line-height:1.5;">' + escapeHtml(r.description) + '</p>' +
-      '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-      priceHtml +
-      '<div style="display:flex; gap:8px; align-items:center;">' +
+      '<p style="font-size:0.85rem; color:#546E7A; margin-bottom:14px; line-height:1.5;">' + escapeHtml(introText) + '</p>' +
+      '<div style="margin-bottom:10px;">' + priceHtml + '</div>' +
+      '<div style="display:flex; gap:8px;">' +
       previewHtml +
       '<a href="' + escapeHtml(r.url) + '" target="_blank"' +
-      ' style="background:#1C4A30; color:#fff; padding:8px 16px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
-      '</div>' +
+      ' style="flex:1; text-align:center; background:#1C4A30; color:#fff; padding:9px 12px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
       '</div>' +
       '</div>' +
       '</div>'
