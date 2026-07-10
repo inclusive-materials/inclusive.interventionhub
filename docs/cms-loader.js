@@ -171,7 +171,7 @@
     return '$' + n.toFixed(2);
   }
 
-  function buildProductCard(resource, opts) {
+  function buildProductCard(resource, opts, index) {
     var r = normalizeResource(resource);
     if (!r || !r.title) return '';
 
@@ -218,18 +218,22 @@
     }
 
     // ── Price (formatted, with optional strikethrough original price) ────────
+    // "/ user" is called out explicitly so schools don't mistake a single
+    // purchase for a site-wide license.
     var priceHtml;
     var origFormatted = formatPrice(r.originalPrice);
     if (origFormatted) {
       priceHtml =
         '<div style="display:flex; flex-direction:column; line-height:1.2;">' +
         '<span style="font-size:0.8rem; color:#9e9e9e; text-decoration:line-through;">' + escapeHtml(origFormatted) + '</span>' +
-        '<span style="font-size:1.2rem; font-weight:700; color:#1C4A30;">' + escapeHtml(formatPrice(r.price)) + '</span>' +
+        '<span><span style="font-size:1.2rem; font-weight:700; color:#1C4A30;">' + escapeHtml(formatPrice(r.price)) + '</span>' +
+        '<span style="font-size:0.78rem; font-weight:600; color:#6b7280;"> / user</span></span>' +
         '</div>';
     } else {
       priceHtml =
         '<span style="font-size:1.2rem; font-weight:700; color:#1C4A30;">' +
-        escapeHtml(formatPrice(r.price)) + '</span>';
+        escapeHtml(formatPrice(r.price)) + '</span>' +
+        '<span style="font-size:0.78rem; font-weight:600; color:#6b7280;"> / user</span>';
     }
 
     // ── Preview link — shown alongside Buy Now when a preview file is set ───
@@ -250,7 +254,8 @@
       ' data-category="' + escapeHtml(cat) + '"' +
       ' data-title="' + escapeHtml(titleLower) + '"' +
       ' data-tags="' + escapeHtml(searchTags) + '"' +
-      ' style="background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">' +
+      (index != null ? ' data-idx="' + index + '"' : '') +
+      ' style="background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer;">' +
       '<div style="position:relative;">' +
       imgHtml +
       badgeHtml +
@@ -329,6 +334,82 @@
       '<h2>' + escapeHtml(r.title) + '</h2>' +
       (parsed.intro ? '<p>' + escapeHtml(parsed.intro) + '</p>' : '') +
       checklistHtml +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  /**
+   * Like parseResourceHighlights, but keeps every checklist item and any
+   * trailing paragraphs after the checklist instead of dropping them — used
+   * for the expanded product modal where nothing should be cut short.
+   */
+  function parseResourceFull(description) {
+    var lines = String(description || '')
+      .split(/\r?\n/)
+      .map(function (l) { return l.trim(); })
+      .filter(Boolean);
+    var introLines = [];
+    var checklist = [];
+    var outroLines = [];
+    var seenChecklist = false;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (/^✅/.test(line)) {
+        seenChecklist = true;
+        checklist.push(line.replace(/^✅\s*/, ''));
+      } else if (!seenChecklist) {
+        if (/^what.?s inside\??$/i.test(line)) continue;
+        introLines.push(line);
+      } else {
+        outroLines.push(line);
+      }
+    }
+    return { intro: introLines.join(' '), checklist: checklist, outro: outroLines.join(' ') };
+  }
+
+  function buildProductModalBody(resource) {
+    var r = normalizeResource(resource);
+    if (!r || !r.title) return '';
+    var parsed = parseResourceFull(r.description);
+
+    var imgHtml = r.image
+      ? '<img src="' + escapeHtml(r.image) + '" alt="' + escapeHtml(r.title) +
+        '" style="width:100%; max-height:320px; object-fit:contain; border-radius:12px; background:#f0f7f3;" />'
+      : '<div style="width:100%; height:220px; background:#f0f7f3; display:flex; align-items:center; justify-content:center; color:#90a89a; border-radius:12px;">' +
+        SVG_PLACEHOLDER + '</div>';
+
+    var badgeHtml = r.badge
+      ? '<span style="display:inline-block; background:#F9A825; color:#fff; font-size:0.75rem; font-weight:700; padding:4px 12px; border-radius:20px; margin-bottom:10px;">' + escapeHtml(r.badge) + '</span>'
+      : '';
+
+    var checklistHtml = parsed.checklist.length
+      ? '<ul style="list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:8px;">' + parsed.checklist.map(function (item) {
+          return '<li style="display:flex; align-items:flex-start; gap:8px; font-size:0.9rem; color:#546E7A;"><span style="color:#1C4A30; font-weight:700;">✓</span>' +
+            escapeHtml(item) + '</li>';
+        }).join('') + '</ul>'
+      : '';
+
+    var previewHtml = r.previewFile
+      ? '<a href="' + escapeHtml(r.previewFile) + '" target="_blank" style="flex:1; text-align:center; background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:10px 16px; border-radius:8px; font-size:0.9rem; font-weight:600; text-decoration:none;">Preview ↗</a>'
+      : '';
+
+    var priceLine =
+      '<span style="font-size:1.4rem; font-weight:700; color:#1C4A30;">' + escapeHtml(formatPrice(r.price)) + '</span>' +
+      '<span style="font-size:0.82rem; font-weight:600; color:#6b7280;"> / user</span>';
+
+    return (
+      badgeHtml +
+      imgHtml +
+      '<h2 style="font-size:1.35rem; font-weight:700; color:#1C4A30; margin:16px 0 10px; line-height:1.4;">' + escapeHtml(r.title) + '</h2>' +
+      (parsed.intro ? '<p style="font-size:0.92rem; color:#546E7A; line-height:1.7; margin-bottom:10px;">' + escapeHtml(parsed.intro) + '</p>' : '') +
+      checklistHtml +
+      (parsed.outro ? '<p style="font-size:0.88rem; color:#546E7A; line-height:1.7; margin-bottom:16px;">' + escapeHtml(parsed.outro) + '</p>' : '') +
+      '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid #eef1ee;">' +
+      '<div>' + priceLine + '</div>' +
+      '<div style="display:flex; gap:10px;">' +
+      previewHtml +
+      '<a href="' + escapeHtml(r.url) + '" target="_blank" style="background:#1C4A30; color:#fff; padding:10px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
       '</div>' +
       '</div>'
     );
@@ -744,9 +825,12 @@
     if (!grid) return;
     var resources = await loadResources();
     if (!resources.length) return;
+    // Exposed so the click-to-expand modal can look up full, untruncated
+    // resource data by the card's data-idx without re-fetching.
+    window.__cmsShopResources = resources;
     var html = resources
-      .map(function (r) {
-        return buildProductCard(r, { includeTags: true });
+      .map(function (r, i) {
+        return buildProductCard(r, { includeTags: true }, i);
       })
       .join('');
     if (html) {
@@ -760,6 +844,7 @@
   window.loadAbout = loadAbout;
   window.loadContact = loadContact;
   window.loadResources = loadResources;
+  window.buildProductModalBody = buildProductModalBody;
 
   window.loadBlogPosts = function () {
     return loadBlogPostsParsed();

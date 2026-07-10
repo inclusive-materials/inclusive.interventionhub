@@ -44,6 +44,46 @@
 @media (max-width: 800px) {
   .shop-layout { flex-direction: column; padding: 0 12px 40px; }
 }
+
+/* ── Product detail modal ─────────────────── */
+.product-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 25, 0.55);
+  z-index: 1000;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+.product-modal-overlay.open { display: flex; }
+.product-modal {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.product-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f7f3;
+  color: #1C4A30;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-modal-close:hover { background: #e0ede7; }
   </style>
 </head>
 <body>
@@ -110,6 +150,14 @@
 
 </div><!-- /shop-layout -->
 
+<!-- ═══════════════════════════════════════════ PRODUCT DETAIL MODAL -->
+<div class="product-modal-overlay" id="productModalOverlay">
+  <div class="product-modal">
+    <button class="product-modal-close" id="productModalClose" aria-label="Close">✕</button>
+    <div id="productModalBody"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════ FOOTER -->
 <footer class="footer">
   <div class="footer__inner">
@@ -148,5 +196,41 @@
 
 <script src="../cms-loader.js"></script>
 <script src="../main.js"></script>
+<script>
+(function () {
+  var overlay = document.getElementById('productModalOverlay');
+  var body = document.getElementById('productModalBody');
+  var closeBtn = document.getElementById('productModalClose');
+  if (!overlay || !body || !closeBtn) return;
+
+  function openModal(idx) {
+    var resources = window.__cmsShopResources || [];
+    var resource = resources[idx];
+    if (!resource || !window.buildProductModalBody) return;
+    body.innerHTML = window.buildProductModalBody(resource);
+    overlay.classList.add('open');
+  }
+  function closeModal() {
+    overlay.classList.remove('open');
+    body.innerHTML = '';
+  }
+
+  document.getElementById('shop-resources-container').addEventListener('click', function (e) {
+    // Ignore clicks on the Preview/Buy Now links so they keep working normally
+    if (e.target.closest('a')) return;
+    var card = e.target.closest('.product-card[data-idx]');
+    if (!card) return;
+    openModal(parseInt(card.getAttribute('data-idx'), 10));
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+})();
+</script>
 </body>
 </html>
