@@ -329,9 +329,6 @@
       '<h2>' + escapeHtml(r.title) + '</h2>' +
       (parsed.intro ? '<p>' + escapeHtml(parsed.intro) + '</p>' : '') +
       checklistHtml +
-      '<div class="resource-feature-cta">' +
-      '<a href="/shop/" class="btn btn--primary">See in Resources →</a>' +
-      '</div>' +
       '</div>' +
       '</div>'
     );
