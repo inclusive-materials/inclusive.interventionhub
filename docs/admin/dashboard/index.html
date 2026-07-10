@@ -489,6 +489,9 @@
       <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#90a89a" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#90a89a" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input id="blog-search" type="text" placeholder="Search posts…" oninput="filterBlogList(this.value)" style="width:100%;padding:.45rem .75rem .45rem 2rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;outline:none;box-sizing:border-box;" />
     </div>
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted);cursor:pointer;margin-bottom:.75rem;">
+      <input type="checkbox" id="blog-show-archived" onchange="renderBlogList()" /> Show archived posts<span id="blog-archived-count"></span>
+    </label>
     <div class="box" id="blog-form-box" style="display:none;">
       <h2 id="blog-form-title">New Blog Post</h2>
       <div class="field"><label>Title *</label><input type="text" id="bf-title" placeholder="e.g. 5 Signs Your Child Needs Hand Strengthening" oninput="autoBlogSlug()" /></div>
@@ -532,6 +535,9 @@
       <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#90a89a" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#90a89a" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input id="product-search" type="text" placeholder="Search products…" oninput="filterProductList(this.value)" style="width:100%;padding:.45rem .75rem .45rem 2rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;outline:none;box-sizing:border-box;" />
     </div>
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted);cursor:pointer;margin-bottom:.75rem;">
+      <input type="checkbox" id="product-show-archived" onchange="renderProductList()" /> Show archived products<span id="product-archived-count"></span>
+    </label>
     <div class="box" id="product-form-box" style="display:none;">
       <h2 id="product-form-title">New Product</h2>
       <div class="field"><label>Title *</label><input type="text" id="pf-title" placeholder="e.g. Playdough Shape Mats" /></div>
@@ -540,61 +546,15 @@
         <div class="field"><label>Price *</label><input type="text" id="pf-price" placeholder="4.99" /></div>
         <div class="field"><label>Original Price <span style="font-weight:400;color:#9ca3af;font-size:.8rem;">(optional — for discount display)</span></label><input type="text" id="pf-original-price" placeholder="e.g. 17.90 — leave blank if no discount" /></div>
       </div>
-      <div class="fg2" style="margin-top:0;">
-        <div class="field">
-          <label>Badge</label>
-          <select id="pf-badge">
-            <option value="">— No Badge —</option>
-            <option value="Featured">Featured</option><option value="New">New</option><option value="Best Seller">Best Seller</option>
-            <option value="Free">Free</option><option value="Bundle">Bundle</option><option value="Sale">Sale</option>
-            <option value="OT Pick">OT Pick</option><option value="SPED Resource">SPED Resource</option>
-            <option value="Speech Resource">Speech Resource</option><option value="General Ed">General Ed</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Level <span style="font-weight:400;color:#9ca3af;font-size:.8rem;">(optional — shows as a pill on card)</span></label>
-          <select id="pf-level">
-            <option value="">— No Level —</option><option value="Level 1">Level 1</option>
-            <option value="Level 2">Level 2</option><option value="Level 3">Level 3</option><option value="Level 4">Level 4</option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label>Category</label>
-        <select id="pf-category">
-          <option value="all">— All Categories —</option>
-          <optgroup label="OT — Fine Motor"><option value="hand strengthening">Hand Strengthening</option><option value="scissor">Scissor Skills</option><option value="pencil grasp">Pencil Grasp &amp; Control</option><option value="in-hand manipulation">In-Hand Manipulation</option><option value="bilateral coordination">Bilateral Coordination</option><option value="pre-writing">Pre-Writing Skills</option><option value="print letter">Print Letter Formation</option><option value="cursive">Cursive Writing</option><option value="spacing">Spacing &amp; Sizing</option></optgroup>
-          <optgroup label="OT — Gross Motor"><option value="core strength">Core Strength &amp; Stability</option><option value="balance">Balance &amp; Coordination</option><option value="proprioception">Body Awareness (Proprioception)</option><option value="motor planning">Motor Planning</option></optgroup>
-          <optgroup label="OT — Sensory"><option value="sensory awareness">Sensory Awareness</option><option value="tactile">Tactile Discrimination</option><option value="vestibular">Vestibular &amp; Movement</option><option value="visual perception">Visual Perception</option><option value="auditory processing">Auditory Processing</option></optgroup>
-          <optgroup label="OT — Visual Motor"><option value="eye-hand">Eye-Hand Coordination</option><option value="copying">Copying &amp; Reproduction</option><option value="visual tracking">Visual Tracking</option></optgroup>
-          <optgroup label="OT — Self-Care"><option value="dressing">Dressing Skills</option><option value="hygiene">Hygiene &amp; Grooming</option><option value="utensil">Eating &amp; Utensil Use</option></optgroup>
-          <optgroup label="OT — Executive Function"><option value="attention">Attention &amp; Focus</option><option value="organization">Organization &amp; Planning</option><option value="problem solving">Problem Solving</option><option value="memory">Working Memory</option></optgroup>
-          <optgroup label="OT — Social &amp; Emotional"><option value="emotion identification">Emotion Identification</option><option value="self-regulation">Self-Regulation</option><option value="social participation">Social Participation</option></optgroup>
-          <optgroup label="Speech — Articulation"><option value="early developing sounds">Early Developing Sounds</option><option value="later developing sounds">Later Developing Sounds</option><option value="phonological">Phonological Processes</option><option value="minimal pair">Minimal Pair Therapy</option></optgroup>
-          <optgroup label="Speech — Language"><option value="receptive language">Receptive Language</option><option value="expressive language">Expressive Language</option><option value="vocabulary">Vocabulary Building</option><option value="sentence structure">Sentence Structure</option></optgroup>
-          <optgroup label="Speech — Fluency"><option value="stuttering">Stuttering Support</option><option value="smooth speech">Smooth Speech Strategies</option></optgroup>
-          <optgroup label="Speech — Social Communication"><option value="pragmatic">Pragmatic Skills</option><option value="conversation">Conversation Skills</option><option value="perspective taking">Perspective Taking</option></optgroup>
-          <optgroup label="Speech — AAC"><option value="core vocabulary">Core Vocabulary</option><option value="symbol-based">Symbol-Based Communication</option><option value="low-tech aac">Low-Tech AAC</option></optgroup>
-          <optgroup label="Speech — Literacy"><option value="phonemic awareness">Phonemic Awareness</option><option value="phonics">Phonics</option><option value="reading fluency">Reading Fluency</option></optgroup>
-          <optgroup label="SPED — Early Intervention"><option value="developmental milestones">Developmental Milestones</option><option value="early cognitive">Early Cognitive Skills</option><option value="sensory play">Sensory Play</option><option value="pre-academic">Pre-Academic Skills</option></optgroup>
-          <optgroup label="SPED — Behavior"><option value="zones of regulation">Zones of Regulation</option><option value="positive behavior">Positive Behavior Supports</option><option value="emotional regulation">Emotional Regulation</option></optgroup>
-          <optgroup label="SPED — Academic Modifications"><option value="reading modifications">Reading Modifications</option><option value="math modifications">Math Modifications</option><option value="written expression">Written Expression Support</option></optgroup>
-          <optgroup label="SPED — Life Skills"><option value="daily living">Daily Living Skills</option><option value="community skills">Community Skills</option><option value="vocational">Vocational Readiness</option></optgroup>
-          <optgroup label="SPED — Social Skills"><option value="peer interaction">Peer Interaction</option><option value="group participation">Group Participation</option><option value="conflict resolution">Conflict Resolution</option></optgroup>
-          <optgroup label="SPED — IEP &amp; Transition"><option value="iep goal">IEP Goal Writing</option><option value="transition to kindergarten">Transition to Kindergarten</option><option value="post-secondary">Post-Secondary Planning</option></optgroup>
-          <optgroup label="General — Early Childhood"><option value="colors shapes">Colors &amp; Shapes</option><option value="basic concepts">Basic Concepts</option><option value="early literacy">Early Literacy</option><option value="number sense">Number Sense</option><option value="print awareness">Print Awareness</option><option value="social skills">Social Skills</option></optgroup>
-          <optgroup label="General — Elementary"><option value="letter recognition">Letter Recognition</option><option value="sight words">Sight Words</option><option value="counting">Counting &amp; Cardinality</option><option value="reading comprehension">Reading Comprehension</option><option value="addition subtraction">Addition &amp; Subtraction</option><option value="writing sentences">Writing Sentences</option><option value="science basics">Science Basics</option></optgroup>
+      <div class="field" style="margin-top:0;">
+        <label>Badge</label>
+        <select id="pf-badge">
+          <option value="">— No Badge —</option>
+          <option value="Featured">Featured</option><option value="New">New</option><option value="Best Seller">Best Seller</option>
+          <option value="Free">Free</option><option value="Bundle">Bundle</option><option value="Sale">Sale</option>
+          <option value="OT Pick">OT Pick</option><option value="SPED Resource">SPED Resource</option>
+          <option value="Speech Resource">Speech Resource</option><option value="General Ed">General Ed</option>
         </select>
-      </div>
-      <div class="field">
-        <label>Tags — Which section of the shop should this appear in?</label>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.35rem;">
-          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;"><input type="checkbox" id="tag-ot" value="ot" /> OT</label>
-          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;"><input type="checkbox" id="tag-speech" value="speech" /> Speech &amp; Language</label>
-          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;"><input type="checkbox" id="tag-sped" value="sped" /> SPED</label>
-          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;font-weight:400;color:var(--text);cursor:pointer;"><input type="checkbox" id="tag-general" value="general" /> General Education</label>
-        </div>
-        <p style="font-size:.74rem;color:var(--muted);margin-top:.35rem;">Tick all that apply. Leave unticked to show in all sections.</p>
       </div>
       <div class="field">
         <label>Cover Image</label>
@@ -605,6 +565,14 @@
         </div>
       </div>
       <div id="pf-photo-grid" class="photo-grid"></div>
+      <div class="field" style="margin-top:.75rem;">
+        <label>Preview File <span style="font-weight:400;color:#9ca3af;font-size:.8rem;">(optional — image or PDF buyers can preview before purchasing)</span></label>
+        <input type="text" id="pf-preview" placeholder="/photos/your-preview.pdf" />
+        <div style="display:flex;align-items:center;gap:.6rem;margin-top:.5rem;flex-wrap:wrap;">
+          <label class="btn btn--teal btn--sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;">⬆ Upload Preview <input type="file" id="pf-preview-upload" accept="image/*,.pdf,application/pdf" style="display:none;" /></label>
+          <span id="preview-upload-status" style="font-size:.78rem;color:var(--muted);"></span>
+        </div>
+      </div>
       <div class="field" style="margin-top:.75rem;"><label>Shop / Buy Link (Payhip URL) *</label><input type="text" id="pf-url" placeholder="https://payhip.com/b/XXXXX" /></div>
       <div class="field" style="margin-top:.75rem;">
         <label>Search Tags <span style="font-weight:400;color:#9ca3af;">(paste keywords buyers would search for)</span></label>
@@ -1334,14 +1302,15 @@ function parseFm(text) {
   });
   return { meta, body: m[2] || '' };
 }
-function buildBlogMd({ title, date, summary, image, published, body }) {
-  return `---\ntitle: ${JSON.stringify(title)}\ndate: ${JSON.stringify(date)}\nsummary: ${JSON.stringify(summary||'')}\nimage: ${JSON.stringify(image||'')}\npublished: ${!!published}\n---\n\n${body||''}`;
+function buildBlogMd({ title, date, summary, image, published, archived, body }) {
+  return `---\ntitle: ${JSON.stringify(title)}\ndate: ${JSON.stringify(date)}\nsummary: ${JSON.stringify(summary||'')}\nimage: ${JSON.stringify(image||'')}\npublished: ${!!published}\narchived: ${!!archived}\n---\n\n${body||''}`;
 }
 
 // ════════════════════════════════
 // BLOG POSTS
 // ════════════════════════════════
-let blogEditSha = null, blogEditPath = null;
+let blogEditSha = null, blogEditPath = null, blogEditArchived = false;
+let blogPostsCache = [];
 
 function autoBlogSlug() {
   if (!blogEditPath) {
@@ -1352,7 +1321,7 @@ function autoBlogSlug() {
 }
 
 document.getElementById('new-post-btn').addEventListener('click', () => {
-  blogEditSha = null; blogEditPath = null;
+  blogEditSha = null; blogEditPath = null; blogEditArchived = false;
   ['bf-title','bf-date','bf-slug','bf-summary','bf-image','bf-body'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = id === 'bf-date' ? todayDT() : '';
   });
@@ -1388,7 +1357,7 @@ document.getElementById('save-post-btn').addEventListener('click', async () => {
   if (!getCMSToken())  { showCMSMsg('blog-msg','No GitHub token — open CMS Settings.','err'); return; }
   const filename = slug.endsWith('.md') ? slug : `${slug}.md`;
   const path = `docs/_data/blog/${filename}`;
-  const content = buildBlogMd({ title, date: new Date(date).toISOString(), summary, image, published, body });
+  const content = buildBlogMd({ title, date: new Date(date).toISOString(), summary, image, published, archived: blogEditArchived, body });
   showCMSMsg('blog-msg','Saving…','info');
   try {
     await cmsWriteFile(path, content, `${blogEditSha ? 'Update' : 'Add'} blog post: ${title}`, blogEditSha);
@@ -1404,7 +1373,7 @@ window.editPost = async function(path) {
   try {
     const { content, sha } = await cmsReadFile(path);
     const { meta, body } = parseFm(content);
-    blogEditSha = sha; blogEditPath = path;
+    blogEditSha = sha; blogEditPath = path; blogEditArchived = meta.archived === true;
     document.getElementById('bf-title').value   = meta.title || '';
     const dt = meta.date ? new Date(meta.date) : new Date();
     dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
@@ -1431,6 +1400,20 @@ window.deletePost = async function(path, title) {
   } catch(e) { alert(`Error: ${e.message}`); }
 };
 
+window.archivePost = async function(path, title, archived) {
+  if (!getCMSToken()) { alert('No GitHub token — open CMS Settings.'); return; }
+  try {
+    const { content, sha } = await cmsReadFile(path);
+    const { meta, body } = parseFm(content);
+    const newContent = buildBlogMd({
+      title: meta.title, date: meta.date, summary: meta.summary, image: meta.image,
+      published: meta.published !== false, archived: !archived, body
+    });
+    await cmsWriteFile(path, newContent, `${archived ? 'Unarchive' : 'Archive'} blog post: ${title}`, sha);
+    loadBlogPosts();
+  } catch(e) { alert(`Error: ${e.message}`); }
+};
+
 async function loadBlogPosts() {
   const el = document.getElementById('blog-list');
   if (!getCMSToken()) {
@@ -1440,44 +1423,61 @@ async function loadBlogPosts() {
   try {
     const files = await cmsListFiles('docs/_data/blog');
     const mdFiles = files.filter(f => f.name.endsWith('.md')).reverse();
-    if (!mdFiles.length) { el.innerHTML = '<div class="cm-empty">No blog posts yet. Click "+ New Post" to create one.</div>'; return; }
-    const posts = await Promise.all(mdFiles.map(async f => {
+    if (!mdFiles.length) { blogPostsCache = []; el.innerHTML = '<div class="cm-empty">No blog posts yet. Click "+ New Post" to create one.</div>'; return; }
+    blogPostsCache = await Promise.all(mdFiles.map(async f => {
       try {
         const { content } = await cmsReadFile(`docs/_data/blog/${f.name}`);
         const { meta } = parseFm(content);
-        return { name: f.name, path: `docs/_data/blog/${f.name}`, title: meta.title || f.name, date: meta.date || '', published: meta.published !== false };
-      } catch { return { name: f.name, path: `docs/_data/blog/${f.name}`, title: f.name, date: '', published: true }; }
+        return { name: f.name, path: `docs/_data/blog/${f.name}`, title: meta.title || f.name, date: meta.date || '', published: meta.published !== false, archived: meta.archived === true };
+      } catch { return { name: f.name, path: `docs/_data/blog/${f.name}`, title: f.name, date: '', published: true, archived: false }; }
     }));
-    const blogQuery = (document.getElementById('blog-search')?.value || '').toLowerCase().trim();
-    el.innerHTML = posts.map(p => `
-      <div class="item blog-list-item" data-search="${(p.title + ' ' + p.name).toLowerCase()}">
-        <div class="item__info">
-          <div class="item__title">${p.title}</div>
-          <div class="item__meta">${p.date ? new Date(p.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '—'} &nbsp;·&nbsp; ${p.published ? '<span style="color:#16a34a">Published</span>' : '<span style="color:#9ca3af">Draft</span>'}</div>
-        </div>
-        <div class="item__actions">
-          <button class="btn btn--outline btn--sm" onclick="editPost('${p.path}')">Edit</button>
-          <button class="btn btn--danger btn--sm" onclick="deletePost('${p.path}','${p.title.replace(/'/g,"\\'")}')">Delete</button>
-        </div>
-      </div>`).join('');
-    if (blogQuery) filterBlogList(blogQuery);
+    renderBlogList();
   } catch(e) {
     if (e.message === 'Not Found' || e.message.includes('404')) {
+      blogPostsCache = [];
       el.innerHTML = '<div class="cm-empty">No blog posts yet. Click "+ New Post" to create one.</div>';
     } else { el.innerHTML = `<div class="cm-empty">Error: ${e.message}</div>`; }
   }
+}
+
+function renderBlogList() {
+  const el = document.getElementById('blog-list');
+  const showArchived = document.getElementById('blog-show-archived')?.checked;
+  const archivedCount = blogPostsCache.filter(p => p.archived).length;
+  const countEl = document.getElementById('blog-archived-count');
+  if (countEl) countEl.textContent = archivedCount ? ` (${archivedCount})` : '';
+  const list = showArchived ? blogPostsCache : blogPostsCache.filter(p => !p.archived);
+  if (!list.length) {
+    el.innerHTML = blogPostsCache.length
+      ? '<div class="cm-empty">No posts to show — try "Show archived posts" above.</div>'
+      : '<div class="cm-empty">No blog posts yet. Click "+ New Post" to create one.</div>';
+    return;
+  }
+  const blogQuery = (document.getElementById('blog-search')?.value || '').toLowerCase().trim();
+  el.innerHTML = list.map(p => `
+    <div class="item blog-list-item" data-search="${(p.title + ' ' + p.name).toLowerCase()}" style="${p.archived ? 'opacity:.6;' : ''}">
+      <div class="item__info">
+        <div class="item__title">${p.title}</div>
+        <div class="item__meta">${p.date ? new Date(p.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '—'} &nbsp;·&nbsp; ${p.published ? '<span style="color:#16a34a">Published</span>' : '<span style="color:#9ca3af">Draft</span>'}${p.archived ? ' &nbsp;·&nbsp; <span style="color:#9ca3af">Archived</span>' : ''}</div>
+      </div>
+      <div class="item__actions">
+        <button class="btn btn--outline btn--sm" onclick="editPost('${p.path}')">Edit</button>
+        <button class="btn btn--outline btn--sm" onclick="archivePost('${p.path}','${p.title.replace(/'/g,"\\'")}',${p.archived})">${p.archived ? 'Unarchive' : 'Archive'}</button>
+        <button class="btn btn--danger btn--sm" onclick="deletePost('${p.path}','${p.title.replace(/'/g,"\\'")}')">Delete</button>
+      </div>
+    </div>`).join('');
+  if (blogQuery) filterBlogList(blogQuery);
 }
 
 // ════════════════════════════════
 // PRODUCTS
 // ════════════════════════════════
 let prodEditSha = null, prodEditPath = null;
+let productsCache = [];
 
-document.getElementById('pf-upload').addEventListener('change', async function() {
-  const file = this.files[0]; if (!file) return;
-  if (!getCMSToken()) { document.getElementById('upload-status').textContent = '⚠ No token — open CMS Settings.'; return; }
-  const status = document.getElementById('upload-status');
-  status.textContent = 'Uploading…';
+async function uploadCMSFile(file, statusEl, onDone) {
+  if (!getCMSToken()) { statusEl.textContent = '⚠ No token — open CMS Settings.'; return; }
+  statusEl.textContent = 'Uploading…';
   try {
     const reader = new FileReader();
     reader.onload = async () => {
@@ -1494,40 +1494,41 @@ document.getElementById('pf-upload').addEventListener('change', async function()
       const path = `docs/photos/${safeName}`;
       let sha = null;
       try { sha = (await ghCMS(`${path}?ref=${GH_BRANCH}`)).sha; } catch {}
-      const body = { message: `Upload image: ${safeName}`, content: base64, branch: GH_BRANCH };
+      const body = { message: `Upload file: ${safeName}`, content: base64, branch: GH_BRANCH };
       if (sha) body.sha = sha;
       await ghCMS(path, 'PUT', body);
-      document.getElementById('pf-image').value = `/photos/${safeName}`;
-      status.textContent = `✓ Uploaded: ${safeName}`;
-      await loadCMSPhotos();
-      renderPhotoGrid('pf-photo-grid', 'pf-image');
+      statusEl.textContent = `✓ Uploaded: ${safeName}`;
+      onDone(safeName);
     };
-    reader.onerror = () => { status.textContent = '⚠ Failed to read file.'; };
+    reader.onerror = () => { statusEl.textContent = '⚠ Failed to read file.'; };
     reader.readAsDataURL(file);
-  } catch(e) { status.textContent = `⚠ Upload failed: ${e.message}`; }
+  } catch(e) { statusEl.textContent = `⚠ Upload failed: ${e.message}`; }
+}
+
+document.getElementById('pf-upload').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  uploadCMSFile(file, document.getElementById('upload-status'), async (safeName) => {
+    document.getElementById('pf-image').value = `/photos/${safeName}`;
+    await loadCMSPhotos();
+    renderPhotoGrid('pf-photo-grid', 'pf-image');
+  });
 });
 
-function resetTagCheckboxes() { ['tag-ot','tag-speech','tag-sped','tag-general'].forEach(id => document.getElementById(id).checked = false); }
-function getTagsValue() {
-  const checked = ['tag-ot','tag-speech','tag-sped','tag-general'].filter(id => document.getElementById(id).checked).map(id => document.getElementById(id).value);
-  return checked.length ? checked.join(' ') : 'all';
-}
-function setTagCheckboxes(audienceStr) {
-  resetTagCheckboxes();
-  if (!audienceStr || audienceStr === 'all') return;
-  audienceStr.split(/\s+/).forEach(v => { const el = document.getElementById('tag-' + v.trim()); if (el) el.checked = true; });
-}
+document.getElementById('pf-preview-upload').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  uploadCMSFile(file, document.getElementById('preview-upload-status'), (safeName) => {
+    document.getElementById('pf-preview').value = `/photos/${safeName}`;
+  });
+});
 
 document.getElementById('new-product-btn').addEventListener('click', () => {
   prodEditSha = null; prodEditPath = null;
-  ['pf-title','pf-desc','pf-price','pf-original-price','pf-image','pf-url','pf-search-tags'].forEach(id => document.getElementById(id).value = '');
+  ['pf-title','pf-desc','pf-price','pf-original-price','pf-image','pf-preview','pf-url','pf-search-tags'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pf-badge').value    = '';
-  document.getElementById('pf-level').value    = '';
-  document.getElementById('pf-category').value = 'all';
   document.getElementById('pf-published').checked = true;
   document.getElementById('pf-featured').checked = true;
   document.getElementById('upload-status').textContent = '';
-  resetTagCheckboxes();
+  document.getElementById('preview-upload-status').textContent = '';
   document.getElementById('product-msg').className = 'cm-msg';
   document.getElementById('product-form-title').textContent = 'New Product';
   renderPhotoGrid('pf-photo-grid', 'pf-image');
@@ -1538,7 +1539,7 @@ document.getElementById('new-product-btn').addEventListener('click', () => {
 
 function cancelProductForm() {
   document.getElementById('product-form-box').style.display = 'none';
-  resetTagCheckboxes(); prodEditSha = null; prodEditPath = null;
+  prodEditSha = null; prodEditPath = null;
 }
 
 document.getElementById('save-product-btn').addEventListener('click', async () => {
@@ -1547,11 +1548,9 @@ document.getElementById('save-product-btn').addEventListener('click', async () =
   const price = document.getElementById('pf-price').value.trim();
   const originalPrice = document.getElementById('pf-original-price').value.trim();
   const badge = document.getElementById('pf-badge').value;
-  const level = document.getElementById('pf-level').value;
   const image = document.getElementById('pf-image').value.trim();
+  const previewFile = document.getElementById('pf-preview').value.trim();
   const url   = document.getElementById('pf-url').value.trim();
-  const audience = getTagsValue();
-  const category = document.getElementById('pf-category').value;
   const featured = document.getElementById('pf-featured').checked;
   const published = document.getElementById('pf-published').checked;
   const searchTags = document.getElementById('pf-search-tags').value.trim();
@@ -1561,15 +1560,14 @@ document.getElementById('save-product-btn').addEventListener('click', async () =
   const path = `docs/_data/resources/${filename}`;
   const payload = { title, description, price };
   if (originalPrice) payload.originalPrice = originalPrice;
-  if (level) payload.level = level;
-  Object.assign(payload, { badge, image, url, featured, published, audience, category, searchTags });
+  Object.assign(payload, { badge, image, previewFile, url, featured, published, searchTags });
   showCMSMsg('product-msg','Saving…','info');
   try {
     let saveSha = null;
     if (prodEditPath) {
       const current = await cmsReadFile(prodEditPath);
       saveSha = current.sha;
-      try { const ep = JSON.parse(current.content); if (ep.createdAt) payload.createdAt = ep.createdAt; } catch {}
+      try { const ep = JSON.parse(current.content); if (ep.createdAt) payload.createdAt = ep.createdAt; if (ep.archived) payload.archived = ep.archived; } catch {}
     } else {
       payload.createdAt = new Date().toISOString();
     }
@@ -1593,15 +1591,14 @@ window.editProduct = async function(path) {
     document.getElementById('pf-price').value          = p.price || '';
     document.getElementById('pf-original-price').value = p.originalPrice || '';
     document.getElementById('pf-badge').value          = p.badge || '';
-    document.getElementById('pf-level').value          = p.level || '';
     document.getElementById('pf-image').value          = p.image || '';
+    document.getElementById('pf-preview').value        = p.previewFile || '';
     document.getElementById('pf-url').value            = p.url || '';
-    document.getElementById('pf-category').value       = p.category || 'all';
     document.getElementById('pf-published').checked    = p.published !== false;
     document.getElementById('pf-featured').checked     = p.featured !== false;
     document.getElementById('pf-search-tags').value    = p.searchTags || '';
     document.getElementById('upload-status').textContent = '';
-    setTagCheckboxes(p.audience || '');
+    document.getElementById('preview-upload-status').textContent = '';
     document.getElementById('product-form-title').textContent = 'Edit Product';
     document.getElementById('product-msg').className = 'cm-msg';
     renderPhotoGrid('pf-photo-grid', 'pf-image');
@@ -1630,6 +1627,17 @@ window.deleteProduct = async function(path, title) {
   } catch(e) { alert(`Error: ${e.message}`); }
 };
 
+window.archiveProduct = async function(path, title, archived) {
+  if (!getCMSToken()) { alert('No GitHub token — open CMS Settings.'); return; }
+  try {
+    const { content, sha } = await cmsReadFile(path);
+    const p = JSON.parse(content);
+    p.archived = !archived;
+    await cmsWriteFile(path, JSON.stringify(p, null, 2), `${archived ? 'Unarchive' : 'Archive'} product: ${title}`, sha);
+    loadProducts();
+  } catch(e) { alert(`Error: ${e.message}`); }
+};
+
 function filterBlogList(query) {
   const q = query.toLowerCase().trim();
   document.querySelectorAll('#blog-list .blog-list-item').forEach(function(item) {
@@ -1653,37 +1661,56 @@ async function loadProducts() {
   try {
     const files = await cmsListFiles('docs/_data/resources');
     const jsonFiles = files.filter(f => f.name.endsWith('.json') && f.name !== 'manifest.json');
-    if (!jsonFiles.length) { el.innerHTML = '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>'; return; }
+    if (!jsonFiles.length) { productsCache = []; el.innerHTML = '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>'; return; }
     const products = await Promise.all(jsonFiles.map(async f => {
       try {
         const { content } = await cmsReadFile(`docs/_data/resources/${f.name}`);
         const p = JSON.parse(content);
-        return { name: f.name, path: `docs/_data/resources/${f.name}`, title: p.title || f.name, price: p.price || '', featured: p.featured !== false, published: p.published !== false, createdAt: p.createdAt || '' };
-      } catch { return { name: f.name, path: `docs/_data/resources/${f.name}`, title: f.name, price: '', featured: true, published: true, createdAt: '' }; }
+        return { name: f.name, path: `docs/_data/resources/${f.name}`, title: p.title || f.name, price: p.price || '', featured: p.featured !== false, published: p.published !== false, createdAt: p.createdAt || '', archived: p.archived === true };
+      } catch { return { name: f.name, path: `docs/_data/resources/${f.name}`, title: f.name, price: '', featured: true, published: true, createdAt: '', archived: false }; }
     }));
     products.sort((a, b) => {
       const d = (b.createdAt || '').localeCompare(a.createdAt || '');
       if (d !== 0) return d;
       return b.name.localeCompare(a.name);
     });
-    const searchQuery = (document.getElementById('product-search')?.value || '').toLowerCase().trim();
-    el.innerHTML = products.map(p => `
-      <div class="item product-list-item" data-search="${(p.title + ' ' + p.name).toLowerCase()}">
-        <div class="item__info">
-          <div class="item__title">${p.title}</div>
-          <div class="item__meta">${p.price} &nbsp;·&nbsp; ${p.createdAt ? `<span style="color:#6b7280">Added ${p.createdAt.slice(0,10)}</span> &nbsp;·&nbsp; ` : ''}${p.published ? '<span style="color:#16a34a">Published</span>' : '<span style="color:#dc2626">Unpublished</span>'} &nbsp;·&nbsp; ${p.featured ? '<span style="color:#16a34a">Featured</span>' : 'Not featured'}</div>
-        </div>
-        <div class="item__actions">
-          <button class="btn btn--outline btn--sm" onclick="editProduct('${p.path}')">Edit</button>
-          <button class="btn btn--danger btn--sm" onclick="deleteProduct('${p.path}','${p.title.replace(/'/g,"\\'")}')">Delete</button>
-        </div>
-      </div>`).join('');
-    if (searchQuery) filterProductList(searchQuery);
+    productsCache = products;
+    renderProductList();
   } catch(e) {
     if (e.message === 'Not Found' || e.message.includes('404')) {
+      productsCache = [];
       el.innerHTML = '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>';
     } else { el.innerHTML = `<div class="cm-empty">Error: ${e.message}</div>`; }
   }
+}
+
+function renderProductList() {
+  const el = document.getElementById('product-list');
+  const showArchived = document.getElementById('product-show-archived')?.checked;
+  const archivedCount = productsCache.filter(p => p.archived).length;
+  const countEl = document.getElementById('product-archived-count');
+  if (countEl) countEl.textContent = archivedCount ? ` (${archivedCount})` : '';
+  const list = showArchived ? productsCache : productsCache.filter(p => !p.archived);
+  if (!list.length) {
+    el.innerHTML = productsCache.length
+      ? '<div class="cm-empty">No products to show — try "Show archived products" above.</div>'
+      : '<div class="cm-empty">No products yet. Click "+ New Product" to add one.</div>';
+    return;
+  }
+  const searchQuery = (document.getElementById('product-search')?.value || '').toLowerCase().trim();
+  el.innerHTML = list.map(p => `
+    <div class="item product-list-item" data-search="${(p.title + ' ' + p.name).toLowerCase()}" style="${p.archived ? 'opacity:.6;' : ''}">
+      <div class="item__info">
+        <div class="item__title">${p.title}</div>
+        <div class="item__meta">${p.price} &nbsp;·&nbsp; ${p.createdAt ? `<span style="color:#6b7280">Added ${p.createdAt.slice(0,10)}</span> &nbsp;·&nbsp; ` : ''}${p.published ? '<span style="color:#16a34a">Published</span>' : '<span style="color:#dc2626">Unpublished</span>'} &nbsp;·&nbsp; ${p.featured ? '<span style="color:#16a34a">Featured</span>' : 'Not featured'}${p.archived ? ' &nbsp;·&nbsp; <span style="color:#9ca3af">Archived</span>' : ''}</div>
+      </div>
+      <div class="item__actions">
+        <button class="btn btn--outline btn--sm" onclick="editProduct('${p.path}')">Edit</button>
+        <button class="btn btn--outline btn--sm" onclick="archiveProduct('${p.path}','${p.title.replace(/'/g,"\\'")}',${p.archived})">${p.archived ? 'Unarchive' : 'Archive'}</button>
+        <button class="btn btn--danger btn--sm" onclick="deleteProduct('${p.path}','${p.title.replace(/'/g,"\\'")}')">Delete</button>
+      </div>
+    </div>`).join('');
+  if (searchQuery) filterProductList(searchQuery);
 }
 
 // ── CMS Token ──

@@ -158,7 +158,7 @@
       category: raw.category || 'all',
       searchTags: raw.searchTags || '',
       originalPrice: raw.originalPrice || '',
-      level: raw.level || '',
+      previewFile: raw.previewFile || '',
     };
   }
 
@@ -175,10 +175,8 @@
     var r = normalizeResource(resource);
     if (!r || !r.title) return '';
 
-    // audience can be a single value ("ot") or space-separated multi-value ("ot speech")
+    // audience/category default to 'all' so cards still match every shop filter pill
     var aud = String(r.audience || 'all').toLowerCase().trim();
-    // Use the first listed audience for chip colour; full string goes into data-audience
-    var primaryAud = aud.split(/\s+/)[0] || 'all';
     var cat = String(r.category || 'all').toLowerCase().trim();
     var titleLower = r.title.toLowerCase();
     var searchTags = String(r.searchTags || '').toLowerCase();
@@ -219,33 +217,6 @@
       }
     }
 
-    // ── Audience / category tag chips ──────────────────────────────────────
-    var audLabel, chipStyle;
-    if (primaryAud === 'speech') {
-      audLabel = 'Speech &amp; Language';
-      chipStyle = 'background:#E8F5E9; color:#2E7D32;';
-    } else if (primaryAud === 'ot') {
-      audLabel = 'OT';
-      chipStyle = 'background:#E0F2F1; color:#00695C;';
-    } else if (primaryAud === 'sped') {
-      audLabel = 'SPED';
-      chipStyle = 'background:#FFF3E0; color:#E65100;';
-    } else {
-      audLabel = 'General Education';
-      chipStyle = 'background:#F3E5F5; color:#6A1B9A;';
-    }
-    var chipBase = 'font-size:0.7rem; font-weight:600; padding:3px 8px; border-radius:12px;';
-    var tagsHtml = '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">' +
-      '<span style="' + chipStyle + ' ' + chipBase + '">' + audLabel + '</span>';
-    if (cat && cat !== 'all') {
-      var catLabel = cat.replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-      tagsHtml += '<span style="' + chipStyle + ' ' + chipBase + '">' + escapeHtml(catLabel) + '</span>';
-    }
-    if (r.level) {
-      tagsHtml += '<span style="' + chipStyle + ' ' + chipBase + '">' + escapeHtml(r.level) + '</span>';
-    }
-    tagsHtml += '</div>';
-
     // ── Price (formatted, with optional strikethrough original price) ────────
     var priceHtml;
     var origFormatted = formatPrice(r.originalPrice);
@@ -261,11 +232,18 @@
         escapeHtml(formatPrice(r.price)) + '</span>';
     }
 
+    // ── Preview link — shown alongside Buy Now when a preview file is set ───
+    var previewHtml = '';
+    if (r.previewFile) {
+      previewHtml =
+        '<a href="' + escapeHtml(r.previewFile) + '" target="_blank"' +
+        ' style="background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:8px 16px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Preview ↗</a>';
+    }
+
     return (
       '<div class="product-card"' +
       ' data-audience="' + escapeHtml(aud) + '"' +
       ' data-category="' + escapeHtml(cat) + '"' +
-      ' data-level="' + escapeHtml(String(r.level || '').toLowerCase()) + '"' +
       ' data-title="' + escapeHtml(titleLower) + '"' +
       ' data-tags="' + escapeHtml(searchTags) + '"' +
       ' style="background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">' +
@@ -274,13 +252,15 @@
       badgeHtml +
       '</div>' +
       '<div style="padding:16px;">' +
-      tagsHtml +
       '<h3 style="font-size:1rem; font-weight:700; color:#1C4A30; margin-bottom:6px; line-height:1.4;">' + escapeHtml(r.title) + '</h3>' +
       '<p style="font-size:0.85rem; color:#546E7A; margin-bottom:12px; line-height:1.5;">' + escapeHtml(r.description) + '</p>' +
       '<div style="display:flex; justify-content:space-between; align-items:center;">' +
       priceHtml +
+      '<div style="display:flex; gap:8px; align-items:center;">' +
+      previewHtml +
       '<a href="' + escapeHtml(r.url) + '" target="_blank"' +
       ' style="background:#1C4A30; color:#fff; padding:8px 16px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
+      '</div>' +
       '</div>' +
       '</div>' +
       '</div>'
@@ -315,6 +295,9 @@
     var published = meta.published;
     var pubStr = published != null ? String(published).toLowerCase().trim() : '';
     if (published === false || pubStr === 'false' || pubStr === 'no' || pubStr === '0') return null;
+    var archived = meta.archived;
+    var archStr = archived != null ? String(archived).toLowerCase().trim() : '';
+    if (archived === true || archStr === 'true' || archStr === 'yes' || archStr === '1') return null;
     var title = meta.title || slug;
     var dateRaw = meta.date || '';
     var t = Date.parse(dateRaw);
@@ -496,7 +479,7 @@
           return (json && typeof json === 'object') ? Object.assign({ _filename: name }, json) : null;
         });
     }));
-    var resources = results.filter(function(r) { return r && r.published !== false; });
+    var resources = results.filter(function(r) { return r && r.published !== false && r.archived !== true; });
     resources.sort(function (a, b) {
       var d = (b.createdAt || '').localeCompare(a.createdAt || '');
       if (d !== 0) return d;

@@ -21,10 +21,10 @@ collections:
       - {label: "Price", name: "price", widget: "string", hint: "e.g. $4.99"}
       - {label: "Badge", name: "badge", widget: "string", default: "Featured", required: false}
       - {label: "Cover Image", name: "image", widget: "image", required: false}
-      - {label: "Shop filter — Audience(s)", name: "audience", widget: "string", required: false, hint: "Space-separated slugs matching the shop pills, e.g. sped ot. Leave blank or use all so every audience filter shows this product."}
-      - {label: "Shop filter — Category", name: "category", widget: "string", required: false, hint: "One slug: fine-motor, iep, or visual (matches shop category pills). Leave blank or use all for every category filter."}
+      - {label: "Preview File", name: "previewFile", widget: "file", required: false, hint: "Image or PDF buyers can preview before purchasing."}
       - {label: "Shop Link / URL", name: "url", widget: "string", default: "./shop.html"}
       - {label: "Featured on Homepage", name: "featured", widget: "boolean", default: true}
+      - {label: "Archived", name: "archived", widget: "boolean", default: false, required: false}
 
   - name: "blog"
     label: "📝 Blog Articles"
@@ -39,4 +39,5 @@ collections:
       - {label: "Full Article Body", name: "body", widget: "markdown"}
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Featured on Homepage", name: "featured", widget: "boolean", default: true}
+      - {label: "Archived", name: "archived", widget: "boolean", default: false, required: false}
 
