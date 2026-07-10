@@ -1220,18 +1220,21 @@ async function ghCMS(path, method = 'GET', body = null) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body) headers['Content-Type'] = 'application/json';
   const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
-    method, headers, body: body ? JSON.stringify(body) : null
+    method, headers, body: body ? JSON.stringify(body) : null, cache: 'no-store'
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || `GitHub error ${res.status}`);
   return data;
 }
+// A unique query param on every read defeats GitHub's edge cache, which can otherwise
+// serve a stale sha for a few seconds right after a write and break the next save/delete.
+function cmsCacheBust() { return `&_=${Date.now()}`; }
 async function cmsListFiles(dir) {
-  const r = await ghCMS(`${dir}?ref=${GH_BRANCH}`);
+  const r = await ghCMS(`${dir}?ref=${GH_BRANCH}${cmsCacheBust()}`);
   return Array.isArray(r) ? r : [];
 }
 async function cmsReadFile(path) {
-  const f = await ghCMS(`${path}?ref=${GH_BRANCH}`);
+  const f = await ghCMS(`${path}?ref=${GH_BRANCH}${cmsCacheBust()}`);
   return { content: decodeURIComponent(escape(atob(f.content.replace(/\n/g,'')))), sha: f.sha };
 }
 async function cmsWriteFile(path, content, message, sha = null) {
@@ -1493,7 +1496,7 @@ async function uploadCMSFile(file, statusEl, onDone) {
         + '.' + ext;
       const path = `docs/photos/${safeName}`;
       let sha = null;
-      try { sha = (await ghCMS(`${path}?ref=${GH_BRANCH}`)).sha; } catch {}
+      try { sha = (await ghCMS(`${path}?ref=${GH_BRANCH}${cmsCacheBust()}`)).sha; } catch {}
       const body = { message: `Upload file: ${safeName}`, content: base64, branch: GH_BRANCH };
       if (sha) body.sha = sha;
       await ghCMS(path, 'PUT', body);
