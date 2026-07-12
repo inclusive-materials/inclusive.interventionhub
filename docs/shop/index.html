@@ -34,38 +34,116 @@
 /* ── Main content area ────────────────── */
 .shop-main { flex: 1; min-width: 0; }
 
-/* Override products grid inside shop-main */
-.shop-main .products-grid {
-  max-width: 100% !important;
-  padding: 20px 0 !important;
-}
-
 /* Responsive */
 @media (max-width: 800px) {
   .shop-layout { flex-direction: column; padding: 0 12px 40px; }
 }
 
-/* ── Inline "see full details" accordion ─────────────────── */
-.product-card__toggle {
+/* ── Resources list — flat, no card box ─────────────────── */
+.shop-resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 20px 0;
+}
+.resource-detail {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.resource-detail--reverse { direction: rtl; }
+.resource-detail--reverse > * { direction: ltr; }
+.resource-detail__visual {
+  background: linear-gradient(135deg, #eaf5ef 0%, #d0ede0 100%);
+  border-radius: 20px;
+  min-height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #eef1ee;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #1C4A30;
-}
-.product-card__toggle-chevron { transition: transform 0.25s ease; flex-shrink: 0; }
-.product-card.expanded .product-card__toggle-chevron { transform: rotate(180deg); }
-.product-card__panel {
-  max-height: 0;
+  position: relative;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  padding: 24px;
 }
-.product-card.expanded .product-card__panel { padding: 0 16px 16px; }
+.resource-detail__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  z-index: 1;
+}
+.resource-detail__content h2 { font-size: clamp(1.5rem, 2.3vw, 2rem); margin-bottom: 14px; color: #1C4A30; }
+.resource-detail__content > p { font-size: 0.95rem; color: #546E7A; line-height: 1.75; margin-bottom: 16px; }
+.resource-detail__checklist {
+  list-style: none;
+  margin: 16px 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.resource-detail__checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: #546E7A; }
+.resource-detail__checklist li .check {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  background: #eaf5ef;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.resource-detail__price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 20px 0;
+}
+.resource-detail__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── Team & Site Licensing — native <details> disclosure ─── */
+.resource-licensing { margin-top: 4px; border-top: 1px solid #eef1ee; padding-top: 16px; }
+.resource-licensing summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  color: #1C4A30;
+  font-size: 0.92rem;
+}
+.resource-licensing summary::-webkit-details-marker { display: none; }
+.resource-licensing summary .chevron { transition: transform 0.25s ease; flex-shrink: 0; }
+.resource-licensing[open] summary .chevron { transform: rotate(180deg); }
+.resource-licensing__tiers { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.resource-licensing__tier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f7faf8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #1A2C1A;
+}
+
+@media (max-width: 860px) {
+  .resource-detail { grid-template-columns: 1fr; gap: 28px; }
+  .resource-detail--reverse { direction: ltr; }
+  .resource-detail__visual { min-height: 220px; }
+}
   </style>
 </head>
 <body>
@@ -113,13 +191,9 @@
   <!-- ── MAIN CONTENT ── -->
   <div class="shop-main">
 
-    <!-- Products grid -->
+    <!-- Resources list -->
     <section class="shop-products">
-      <div class="products-grid" id="shop-resources-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:24px; padding:20px 0; margin:0 auto;">
-
-
-
-      </div>
+      <div class="shop-resources-list" id="shop-resources-container"></div>
 
       <!-- Empty state -->
       <div id="emptyState" class="hidden" style="text-align:center; padding:80px 0; color:#90a89a;">
@@ -174,48 +248,5 @@
 
 <script src="../cms-loader.js"></script>
 <script src="../main.js"></script>
-<script>
-(function () {
-  var container = document.getElementById('shop-resources-container');
-  if (!container) return;
-
-  function collapse(card) {
-    var panel = card.querySelector('.product-card__panel');
-    card.classList.remove('expanded');
-    if (panel) panel.style.maxHeight = '0px';
-    var label = card.querySelector('.product-card__toggle-label');
-    if (label) label.textContent = 'See full details';
-  }
-
-  function expand(card) {
-    var panel = card.querySelector('.product-card__panel');
-    if (!panel) return;
-    if (!panel.dataset.loaded) {
-      var resources = window.__cmsShopResources || [];
-      var resource = resources[parseInt(card.getAttribute('data-idx'), 10)];
-      if (resource && window.buildProductExpandDetails) {
-        panel.innerHTML = window.buildProductExpandDetails(resource);
-      }
-      panel.dataset.loaded = 'true';
-    }
-    card.classList.add('expanded');
-    panel.style.maxHeight = panel.scrollHeight + 'px';
-    var label = card.querySelector('.product-card__toggle-label');
-    if (label) label.textContent = 'Hide details';
-  }
-
-  container.addEventListener('click', function (e) {
-    // Ignore clicks on the Preview/Buy Now links so they keep working normally
-    if (e.target.closest('a')) return;
-    var card = e.target.closest('.product-card[data-idx]');
-    if (!card) return;
-    if (card.classList.contains('expanded')) {
-      collapse(card);
-    } else {
-      expand(card);
-    }
-  });
-})();
-</script>
 </body>
 </html>

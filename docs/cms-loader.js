@@ -177,29 +177,30 @@
     return '₱' + formatted;
   }
 
-  function buildProductCard(resource, opts, index) {
+  /**
+   * Renders a resource's full details flat on the shop page (no card box,
+   * no click-to-reveal) — image, title, complete description, and full
+   * checklist are all visible immediately. Only "Team & Site Licensing"
+   * collapses, via a native <details> disclosure, since that tier table is
+   * the one section most visitors don't need up front.
+   */
+  function buildResourceDetailBlock(resource, index) {
     var r = normalizeResource(resource);
     if (!r || !r.title) return '';
 
-    // audience/category default to 'all' so cards still match every shop filter pill
+    // audience/category default to 'all' so entries still match every shop filter pill
     var aud = String(r.audience || 'all').toLowerCase().trim();
     var cat = String(r.category || 'all').toLowerCase().trim();
     var titleLower = r.title.toLowerCase();
     var searchTags = String(r.searchTags || '').toLowerCase();
+    var parsed = parseResourceFull(r.description);
 
-    // ── Image (with object-position:top) ──────────────────────────────────
-    var imgHtml;
-    if (r.image) {
-      imgHtml =
-        '<img src="' + escapeHtml(r.image) + '" alt="' + escapeHtml(r.title) +
-        '" loading="lazy" style="width:100%; height:220px; object-fit:cover; object-position:top; display:block;" />';
-    } else {
-      imgHtml =
-        '<div style="width:100%; height:220px; background:#f0f7f3; display:flex; align-items:center; justify-content:center; color:#90a89a;">' +
-        SVG_PLACEHOLDER + '</div>';
-    }
+    var imgHtml = r.image
+      ? '<img src="' + escapeHtml(r.image) + '" alt="' + escapeHtml(r.title) +
+        '" loading="lazy" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:12px;" />'
+      : '<div style="color:#90a89a;">' + SVG_PLACEHOLDER + '</div>';
 
-    // ── Badge — absolutely positioned over image ───────────────────────────
+    // ── Badges — absolutely positioned over the visual ──────────────────────
     var badgeHtml = '';
     if (r.badge) {
       var bl = r.badge.toLowerCase();
@@ -207,83 +208,93 @@
                  : (bl === 'featured' || bl === 'popular' || bl === 'best seller') ? '#F9A825'
                  : '#00897B';
       badgeHtml =
-        '<span style="position:absolute; top:10px; left:10px; background:' + bColor +
-        '; color:#fff; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:20px;">' +
+        '<span class="resource-detail__badge" style="background:' + bColor + ';">' +
         escapeHtml(r.badge) + '</span>';
     }
-    // Add "Save X%" badge top-right when an original price is set
     if (r.originalPrice) {
       var origVal = parseFloat(String(r.originalPrice).replace(/[^0-9.]/g, ''));
       var saleVal = parseFloat(String(r.price).replace(/[^0-9.]/g, ''));
       if (!isNaN(origVal) && !isNaN(saleVal) && origVal > saleVal) {
         var savePct = Math.round((origVal - saleVal) / origVal * 100);
         badgeHtml +=
-          '<span style="position:absolute; top:10px; right:10px; background:#F9A825; color:#fff; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:20px;">' +
-          'Save ' + savePct + '%</span>';
+          '<span class="resource-detail__badge" style="right:14px; left:auto; background:#F9A825;">Save ' + savePct + '%</span>';
       }
     }
 
-    // ── Price (formatted, with optional strikethrough original price) ────────
-    // "/ user" is called out explicitly so schools don't mistake a single
-    // purchase for a site-wide license.
+    // ── Full checklist (nothing truncated) ───────────────────────────────
+    var checklistHtml = parsed.checklist.length
+      ? '<ul class="resource-detail__checklist">' + parsed.checklist.map(function (item) {
+          return '<li><span class="check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none">' +
+            '<path d="M2 5l2 2 4-4" stroke="var(--green-dark)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+            escapeHtml(item) + '</li>';
+        }).join('') + '</ul>'
+      : '';
+
+    // ── Price ─────────────────────────────────────────────────────────────
     var priceHtml;
     var origFormatted = formatPrice(r.originalPrice);
     if (origFormatted) {
       priceHtml =
         '<div style="display:flex; flex-direction:column; line-height:1.2;">' +
-        '<span style="font-size:0.8rem; color:#9e9e9e; text-decoration:line-through;">' + escapeHtml(origFormatted) + '</span>' +
-        '<span><span style="font-size:1.2rem; font-weight:700; color:#1C4A30;">' + escapeHtml(formatPrice(r.price)) + '</span>' +
-        '<span style="font-size:0.78rem; font-weight:600; color:#6b7280;"> / user</span></span>' +
+        '<span style="font-size:0.85rem; color:#9e9e9e; text-decoration:line-through;">' + escapeHtml(origFormatted) + '</span>' +
+        '<span><span style="font-size:1.4rem; font-weight:700; color:#1C4A30;">' + escapeHtml(formatPrice(r.price)) + '</span>' +
+        '<span style="font-size:0.82rem; font-weight:600; color:#6b7280;"> / user</span></span>' +
         '</div>';
     } else {
       priceHtml =
-        '<span style="font-size:1.2rem; font-weight:700; color:#1C4A30;">' +
+        '<span style="font-size:1.4rem; font-weight:700; color:#1C4A30;">' +
         escapeHtml(formatPrice(r.price)) + '</span>' +
-        '<span style="font-size:0.78rem; font-weight:600; color:#6b7280;"> / user</span>';
+        '<span style="font-size:0.82rem; font-weight:600; color:#6b7280;"> / user</span>';
     }
+
+    var previewHtml = r.previewFile
+      ? '<a href="' + escapeHtml(r.previewFile) + '" target="_blank" style="text-align:center; background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:10px 18px; border-radius:8px; font-size:0.9rem; font-weight:600; text-decoration:none;">Preview ↗</a>'
+      : '';
+
+    // ── Team & Site Licensing — native <details> disclosure ────────────────
+    var licensingHtml = '';
     if (r.pricingTiers.length) {
-      priceHtml += '<div style="font-size:0.76rem; color:#6b7280; margin-top:4px;">Team &amp; site licenses available</div>';
+      licensingHtml =
+        '<details class="resource-licensing">' +
+        '<summary><span>Team &amp; Site Licensing</span>' +
+        '<svg class="chevron" width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</summary>' +
+        '<div class="resource-licensing__tiers">' +
+        r.pricingTiers.map(function (tier) {
+          return (
+            '<div class="resource-licensing__tier">' +
+            '<div><strong>' + escapeHtml(tier.label || '') + '</strong>' +
+            (tier.range ? '<span style="color:#6b7280;"> — ' + escapeHtml(tier.range) + '</span>' : '') + '</div>' +
+            '<span style="font-weight:700; color:#1C4A30; white-space:nowrap;">' + escapeHtml(formatPrice(tier.price)) + '</span>' +
+            '</div>'
+          );
+        }).join('') +
+        '</div>' +
+        '</details>';
     }
 
-    // ── Preview link — shown alongside Buy Now when a preview file is set ───
-    var previewHtml = '';
-    if (r.previewFile) {
-      previewHtml =
-        '<a href="' + escapeHtml(r.previewFile) + '" target="_blank"' +
-        ' style="flex:1; text-align:center; background:#fff; color:#1C4A30; border:1px solid #1C4A30; padding:8px 12px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Preview ↗</a>';
-    }
-
-    // ── Description — clean intro only, no raw "✅ item" checklist clutter ──
-    var introText = parseResourceHighlights(r.description).intro || r.description;
-    if (introText.length > 140) introText = introText.slice(0, 137).trim() + '…';
+    var reverseClass = (index % 2 === 1) ? ' resource-detail--reverse' : '';
 
     return (
-      '<div class="product-card"' +
+      '<div class="resource-detail' + reverseClass + '"' +
       ' data-audience="' + escapeHtml(aud) + '"' +
       ' data-category="' + escapeHtml(cat) + '"' +
       ' data-title="' + escapeHtml(titleLower) + '"' +
-      ' data-tags="' + escapeHtml(searchTags) + '"' +
-      (index != null ? ' data-idx="' + index + '"' : '') +
-      ' style="background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer;">' +
-      '<div style="position:relative;">' +
-      imgHtml +
-      badgeHtml +
-      '</div>' +
-      '<div style="padding:16px;">' +
-      '<h3 style="font-size:1rem; font-weight:700; color:#1C4A30; margin-bottom:6px; line-height:1.4;">' + escapeHtml(r.title) + '</h3>' +
-      '<p style="font-size:0.85rem; color:#546E7A; margin-bottom:14px; line-height:1.5;">' + escapeHtml(introText) + '</p>' +
-      '<div style="margin-bottom:10px;">' + priceHtml + '</div>' +
-      '<div style="display:flex; gap:8px;">' +
-      previewHtml +
-      '<a href="' + escapeHtml(r.url) + '" target="_blank"' +
-      ' style="flex:1; text-align:center; background:#1C4A30; color:#fff; padding:9px 12px; border-radius:8px; font-size:0.85rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
-      '</div>' +
-      '<div class="product-card__toggle">' +
-      '<span class="product-card__toggle-label">See full details</span>' +
-      '<svg class="product-card__toggle-chevron" width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      ' data-tags="' + escapeHtml(searchTags) + '">' +
+      '<div class="resource-detail__visual">' + badgeHtml + imgHtml + '</div>' +
+      '<div class="resource-detail__content">' +
+      '<h2>' + escapeHtml(r.title) + '</h2>' +
+      (parsed.intro ? '<p>' + escapeHtml(parsed.intro) + '</p>' : '') +
+      checklistHtml +
+      (parsed.outro ? '<p>' + escapeHtml(parsed.outro) + '</p>' : '') +
+      '<div class="resource-detail__price-row">' +
+      '<div>' + priceHtml + '</div>' +
+      '<div class="resource-detail__actions">' + previewHtml +
+      '<a href="' + escapeHtml(r.url) + '" target="_blank" style="text-align:center; background:#1C4A30; color:#fff; padding:11px 20px; border-radius:8px; font-size:0.9rem; font-weight:600; text-decoration:none;">Buy Now ↗</a>' +
       '</div>' +
       '</div>' +
-      '<div class="product-card__panel"></div>' +
+      licensingHtml +
+      '</div>' +
       '</div>'
     );
   }
@@ -380,51 +391,6 @@
       }
     }
     return { intro: introLines.join(' '), checklist: checklist, outro: outroLines.join(' ') };
-  }
-
-  /**
-   * Builds the content revealed when a shop product card is expanded in place.
-   * Only covers what the collapsed card doesn't already show (image, title,
-   * price, Preview/Buy Now) — the full "what's inside" checklist, any
-   * trailing description text, and team/site licensing tiers.
-   */
-  function buildProductExpandDetails(resource) {
-    var r = normalizeResource(resource);
-    if (!r || !r.title) return '';
-    var parsed = parseResourceFull(r.description);
-
-    var checklistHtml = parsed.checklist.length
-      ? '<ul style="list-style:none; margin:0 0 12px; padding:0; display:flex; flex-direction:column; gap:8px;">' + parsed.checklist.map(function (item) {
-          return '<li style="display:flex; align-items:flex-start; gap:8px; font-size:0.9rem; color:#546E7A;"><span style="color:#1C4A30; font-weight:700;">✓</span>' +
-            escapeHtml(item) + '</li>';
-        }).join('') + '</ul>'
-      : '';
-
-    var tiersHtml = '';
-    if (r.pricingTiers.length) {
-      tiersHtml =
-        '<div style="margin:16px 0 4px;">' +
-        '<h4 style="font-size:0.85rem; font-weight:700; color:#1C4A30; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:10px;">Team &amp; Site Licensing</h4>' +
-        '<div style="display:flex; flex-direction:column; gap:8px;">' +
-        r.pricingTiers.map(function (tier) {
-          return (
-            '<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#f7faf8; border-radius:8px; padding:10px 14px;">' +
-            '<div style="font-size:0.86rem; color:#1A2C1A;"><strong>' + escapeHtml(tier.label || '') + '</strong>' +
-            (tier.range ? '<span style="color:#6b7280;"> — ' + escapeHtml(tier.range) + '</span>' : '') + '</div>' +
-            '<span style="font-size:0.9rem; font-weight:700; color:#1C4A30; white-space:nowrap;">' + escapeHtml(formatPrice(tier.price)) + '</span>' +
-            '</div>'
-          );
-        }).join('') +
-        '</div>' +
-        '</div>';
-    }
-
-    return (
-      (parsed.intro ? '<p style="font-size:0.88rem; color:#546E7A; line-height:1.7; margin:0 0 12px;">' + escapeHtml(parsed.intro) + '</p>' : '') +
-      checklistHtml +
-      (parsed.outro ? '<p style="font-size:0.88rem; color:#546E7A; line-height:1.7; margin:0 0 4px;">' + escapeHtml(parsed.outro) + '</p>' : '') +
-      tiersHtml
-    );
   }
 
   function parseFrontmatterMarkdown(text) {
@@ -837,12 +803,9 @@
     if (!grid) return;
     var resources = await loadResources();
     if (!resources.length) return;
-    // Exposed so the click-to-expand panel can look up full, untruncated
-    // resource data by the card's data-idx without re-fetching.
-    window.__cmsShopResources = resources;
     var html = resources
       .map(function (r, i) {
-        return buildProductCard(r, { includeTags: true }, i);
+        return buildResourceDetailBlock(r, i);
       })
       .join('');
     if (html) {
@@ -856,7 +819,6 @@
   window.loadAbout = loadAbout;
   window.loadContact = loadContact;
   window.loadResources = loadResources;
-  window.buildProductExpandDetails = buildProductExpandDetails;
 
   window.loadBlogPosts = function () {
     return loadBlogPostsParsed();

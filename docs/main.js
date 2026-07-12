@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilters() {
-      const cards = productsGrid.querySelectorAll('.product-card');
+      const cards = productsGrid.querySelectorAll('.resource-detail');
       let visibleCount = 0;
 
       cards.forEach(card => {
