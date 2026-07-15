@@ -679,6 +679,45 @@
 
       <h2 style="font-size:1.05rem;font-weight:700;color:var(--green);margin:1.5rem 0 1rem;">All Families</h2>
       <div id="fam-list"><div class="cm-empty">Loading…</div></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:2rem 0 1rem;flex-wrap:wrap;gap:.5rem;">
+        <div>
+          <h2 style="font-size:1.05rem;font-weight:700;color:var(--green);">Shared Materials</h2>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.2rem;">Resources you upload here show up in parents' portal — either for every family, or only the ones you assign.</p>
+        </div>
+        <button class="btn btn--primary" id="new-material-btn">+ New Material</button>
+      </div>
+
+      <div class="box" id="material-form-box" style="display:none;">
+        <h2 id="material-form-title">New Material</h2>
+        <div class="field"><label>Title *</label><input type="text" id="mf-title" placeholder="e.g. Sound Cards Pack" /></div>
+        <div class="field"><label>Subject</label><input type="text" id="mf-subject" placeholder="e.g. Speech, OT, Reading" /></div>
+        <div class="field"><label>Description</label><textarea id="mf-desc" rows="2"></textarea></div>
+        <div class="field">
+          <label>File * <span id="mf-current-file" style="font-weight:400;color:#9ca3af;font-size:.8rem;"></span></label>
+          <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+            <label class="btn btn--teal btn--sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;">⬆ Choose File<input type="file" id="mf-file" style="display:none;" /></label>
+            <span id="mf-file-status" style="font-size:.78rem;color:var(--muted);"></span>
+          </div>
+        </div>
+        <div class="field field--row" style="margin-top:.75rem;">
+          <label class="tog"><input type="checkbox" id="mf-global" checked /><span class="tog-s"></span></label>
+          <label for="mf-global">Visible to all parents</label>
+        </div>
+        <div class="field" id="mf-assign-wrap" style="display:none;">
+          <label>Assign to specific families</label>
+          <div id="mf-assign-list" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:.5rem .7rem;"></div>
+        </div>
+        <div class="btn-row" style="margin-top:.75rem;">
+          <button class="btn btn--primary" id="save-material-btn">💾 Save Material</button>
+          <button class="btn btn--outline" id="cancel-material-btn">Cancel</button>
+          <span class="cm-msg" id="material-msg"></span>
+        </div>
+      </div>
+
+      <div class="box" id="material-list-box">
+        <div id="material-list"><div class="cm-empty">Loading…</div></div>
+      </div>
     </div>
 
   </div>
@@ -1836,6 +1875,9 @@ const db = getFirestore(fbApp);
 
 let childrenCache = {};
 let unsubscribeChildren = null;
+let materialsCache = [];
+let editingMaterialId = null;
+let pendingMaterialFile = null; // { fileName, mimeType, fileData } once a new file is chosen
 
 function famShowState(state, email) {
   document.getElementById('fam-signin-box').style.display = state === 'signedout' ? 'block' : 'none';
@@ -1854,6 +1896,7 @@ onAuthStateChanged(fbAuth, (user) => {
   if (user.email !== ADMIN_EMAIL) { famShowState('wrong', user.email); return; }
   famShowState('ok', user.email);
   watchChildren();
+  loadMaterials();
 });
 
 document.getElementById('fam-signin-btn').addEventListener('click', () => {
@@ -1887,7 +1930,19 @@ function renderProgressList(progress) {
     </div>`).join('');
 }
 
-function renderChildCard(id, c, progress) {
+function renderSessionsList(sessions) {
+  if (!sessions || !sessions.length) return '<p style="font-size:.84rem;color:var(--muted);">No sessions logged yet.</p>';
+  const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
+  return sorted.map(s => `
+    <div class="item">
+      <div class="item__info">
+        <div class="item__title">${s.date} — ${s.subject || 'Session'}${s.durationMinutes ? ` (${s.durationMinutes} min)` : ''}</div>
+        ${s.notes ? `<div class="item__meta">${s.notes}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function renderChildCard(id, c, progress, sessions) {
   const emails = (c.authorizedEmails || []).join(', ');
   return `
   <div class="box">
@@ -1924,6 +1979,20 @@ function renderChildCard(id, c, progress) {
     </div>
 
     <hr class="section-sep" />
+    <h3 style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.5rem;">Sessions</h3>
+    <div id="fam-sessions-list-${id}">${renderSessionsList(sessions)}</div>
+    <div class="fg3" style="margin-top:.75rem;">
+      <div class="field"><label>Date</label><input type="date" id="fs-date-${id}" /></div>
+      <div class="field"><label>Subject</label><input type="text" id="fs-subject-${id}" placeholder="e.g. Articulation therapy" /></div>
+      <div class="field"><label>Duration (min)</label><input type="number" min="1" id="fs-duration-${id}" /></div>
+    </div>
+    <div class="field"><label>Notes (visible to parent)</label><textarea id="fs-notes-${id}" rows="2"></textarea></div>
+    <div class="btn-row">
+      <button class="btn btn--primary btn--sm" data-fam-add-session="${id}">+ Log Session</button>
+      <span class="cm-msg" id="fam-session-msg-${id}"></span>
+    </div>
+
+    <hr class="section-sep" />
     <h3 style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.5rem;">Progress Entries</h3>
     <div id="fam-progress-list-${id}">${renderProgressList(progress)}</div>
     <div class="fg3" style="margin-top:.75rem;">
@@ -1948,11 +2017,16 @@ async function renderFamilyList() {
   if (!ids.length) { el.innerHTML = '<div class="cm-empty">No families yet — add one above.</div>'; return; }
   el.innerHTML = '<div class="cm-empty">Loading…</div>';
   const progressByChild = {};
+  const sessionsByChild = {};
   await Promise.all(ids.map(async (id) => {
-    const snap = await getDocs(query(collection(db, 'children', id, 'progress'), orderBy('date', 'desc')));
-    progressByChild[id] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const [pSnap, sSnap] = await Promise.all([
+      getDocs(query(collection(db, 'children', id, 'progress'), orderBy('date', 'desc'))),
+      getDocs(query(collection(db, 'children', id, 'sessions'), orderBy('date', 'desc'))),
+    ]);
+    progressByChild[id] = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    sessionsByChild[id] = sSnap.docs.map(d => ({ id: d.id, ...d.data() }));
   }));
-  el.innerHTML = ids.map(id => renderChildCard(id, childrenCache[id], progressByChild[id])).join('');
+  el.innerHTML = ids.map(id => renderChildCard(id, childrenCache[id], progressByChild[id], sessionsByChild[id])).join('');
 }
 
 // Event delegation for the dynamically-rendered child cards
@@ -1965,6 +2039,8 @@ document.getElementById('fam-list').addEventListener('click', (e) => {
   if (saveBaseline) { famSaveBaseline(saveBaseline.dataset.famSaveBaseline); return; }
   const addProgress = e.target.closest('[data-fam-add-progress]');
   if (addProgress) { famAddProgress(addProgress.dataset.famAddProgress); return; }
+  const addSession = e.target.closest('[data-fam-add-session]');
+  if (addSession) { famAddSession(addSession.dataset.famAddSession); return; }
 });
 document.getElementById('fam-list').addEventListener('change', (e) => {
   const toggle = e.target.closest('[data-fam-toggle]');
@@ -2075,9 +2151,167 @@ async function famAddProgress(id) {
   } catch (err) { showCMSMsg(`fam-progress-msg-${id}`, 'Error: ' + err.message, 'err'); }
 }
 
+async function famAddSession(id) {
+  const date = document.getElementById(`fs-date-${id}`).value;
+  const subject = document.getElementById(`fs-subject-${id}`).value.trim() || null;
+  const durationRaw = document.getElementById(`fs-duration-${id}`).value;
+  const durationMinutes = durationRaw ? Number(durationRaw) : null;
+  const notes = document.getElementById(`fs-notes-${id}`).value.trim() || null;
+  if (!date) { showCMSMsg(`fam-session-msg-${id}`, 'Date is required.', 'err'); return; }
+  try {
+    await addDoc(collection(db, 'children', id, 'sessions'), {
+      date, subject, durationMinutes, notes, createdAt: serverTimestamp()
+    });
+    document.getElementById(`fs-date-${id}`).value = '';
+    document.getElementById(`fs-subject-${id}`).value = '';
+    document.getElementById(`fs-duration-${id}`).value = '';
+    document.getElementById(`fs-notes-${id}`).value = '';
+    showCMSMsg(`fam-session-msg-${id}`, '✓ Session logged.', 'ok');
+    renderFamilyList();
+  } catch (err) { showCMSMsg(`fam-session-msg-${id}`, 'Error: ' + err.message, 'err'); }
+}
+
+// ─────────────────────────────────────────
+// SHARED MATERIALS (top-level 'materials' collection — global or per-family)
+// ─────────────────────────────────────────
+async function loadMaterials() {
+  const el = document.getElementById('material-list');
+  el.innerHTML = '<div class="cm-empty">Loading…</div>';
+  try {
+    const snap = await getDocs(query(collection(db, 'materials'), orderBy('createdAt', 'desc')));
+    materialsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderMaterialList();
+  } catch (err) {
+    el.innerHTML = `<div class="cm-empty">Couldn't load materials: ${err.message}</div>`;
+  }
+}
+
+function renderMaterialList() {
+  const el = document.getElementById('material-list');
+  if (!materialsCache.length) { el.innerHTML = '<div class="cm-empty">No materials yet. Click "+ New Material" to add one.</div>'; return; }
+  el.innerHTML = materialsCache.map(m => {
+    const assignedCount = (m.assignedChildIds || []).length;
+    const visibility = m.isGlobal
+      ? 'All parents'
+      : (assignedCount ? `${assignedCount} famil${assignedCount === 1 ? 'y' : 'ies'}` : 'Nobody yet');
+    return `
+    <div class="item">
+      <div class="item__info">
+        <div class="item__title">${m.title}</div>
+        <div class="item__meta">${m.subject ? m.subject + ' · ' : ''}${visibility}${m.fileName ? ' · ' + m.fileName : ''}</div>
+      </div>
+      <div class="item__actions">
+        <button class="btn btn--outline btn--sm" data-material-edit="${m.id}">Edit</button>
+        <button class="btn btn--danger btn--sm" data-material-delete="${m.id}">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('material-list').addEventListener('click', (e) => {
+  const editBtn = e.target.closest('[data-material-edit]');
+  if (editBtn) { openMaterialForm(editBtn.dataset.materialEdit); return; }
+  const delBtn = e.target.closest('[data-material-delete]');
+  if (delBtn) { deleteMaterial(delBtn.dataset.materialDelete); return; }
+});
+
+function renderMaterialAssignList(selectedIds) {
+  const wrap = document.getElementById('mf-assign-list');
+  const ids = Object.keys(childrenCache);
+  if (!ids.length) { wrap.innerHTML = '<p style="font-size:.82rem;color:var(--muted);">No families yet — add one above first.</p>'; return; }
+  wrap.innerHTML = ids.map(id => `
+    <label style="display:flex;align-items:center;gap:.5rem;font-size:.86rem;padding:.2rem 0;font-weight:400;">
+      <input type="checkbox" class="mf-assign-child" value="${id}" ${selectedIds.includes(id) ? 'checked' : ''}> ${childrenCache[id].name}
+    </label>`).join('');
+}
+
+function openMaterialForm(id) {
+  editingMaterialId = id || null;
+  pendingMaterialFile = null;
+  const m = id ? materialsCache.find(x => x.id === id) : null;
+  document.getElementById('material-form-title').textContent = m ? 'Edit Material' : 'New Material';
+  document.getElementById('mf-title').value = m?.title || '';
+  document.getElementById('mf-subject').value = m?.subject || '';
+  document.getElementById('mf-desc').value = m?.description || '';
+  document.getElementById('mf-current-file').textContent = m?.fileName ? `— current: ${m.fileName}` : '';
+  document.getElementById('mf-file-status').textContent = '';
+  document.getElementById('mf-file').value = '';
+  document.getElementById('mf-global').checked = m ? !!m.isGlobal : true;
+  document.getElementById('mf-assign-wrap').style.display = (m && !m.isGlobal) ? 'block' : 'none';
+  renderMaterialAssignList(m?.assignedChildIds || []);
+  document.getElementById('material-msg').textContent = '';
+  document.getElementById('material-form-box').style.display = 'block';
+  document.getElementById('material-form-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('new-material-btn').addEventListener('click', () => openMaterialForm(null));
+document.getElementById('cancel-material-btn').addEventListener('click', () => {
+  document.getElementById('material-form-box').style.display = 'none';
+});
+document.getElementById('mf-global').addEventListener('change', (e) => {
+  document.getElementById('mf-assign-wrap').style.display = e.target.checked ? 'none' : 'block';
+});
+
+document.getElementById('mf-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('mf-file-status');
+  if (file.size > MAX_FILE_BYTES) {
+    statusEl.textContent = `File too large (${Math.round(file.size / 1024)}KB) — please keep it under ${Math.round(MAX_FILE_BYTES / 1024)}KB.`;
+    e.target.value = '';
+    return;
+  }
+  statusEl.textContent = 'Reading file…';
+  try {
+    const fileData = await readFileAsBase64(file);
+    pendingMaterialFile = { fileName: file.name, mimeType: file.type || 'application/octet-stream', fileData };
+    statusEl.textContent = '✓ Ready to save';
+  } catch (err) { statusEl.textContent = 'Error reading file: ' + err.message; }
+});
+
+document.getElementById('save-material-btn').addEventListener('click', async () => {
+  const title = document.getElementById('mf-title').value.trim();
+  const subject = document.getElementById('mf-subject').value.trim() || null;
+  const description = document.getElementById('mf-desc').value.trim() || null;
+  const isGlobal = document.getElementById('mf-global').checked;
+  const assignedChildIds = isGlobal ? [] : Array.from(document.querySelectorAll('.mf-assign-child:checked')).map(el => el.value);
+
+  if (!title) { showCMSMsg('material-msg', 'Title is required.', 'err'); return; }
+
+  const existing = editingMaterialId ? materialsCache.find(x => x.id === editingMaterialId) : null;
+  if (!pendingMaterialFile && !existing?.fileData) { showCMSMsg('material-msg', 'Choose a file.', 'err'); return; }
+
+  const payload = {
+    title, subject, description, isGlobal, assignedChildIds,
+    fileName: pendingMaterialFile?.fileName || existing?.fileName || null,
+    mimeType: pendingMaterialFile?.mimeType || existing?.mimeType || null,
+    fileData: pendingMaterialFile?.fileData || existing?.fileData || null,
+  };
+
+  try {
+    if (editingMaterialId) {
+      await updateDoc(doc(db, 'materials', editingMaterialId), payload);
+    } else {
+      await addDoc(collection(db, 'materials'), { ...payload, createdAt: serverTimestamp() });
+    }
+    document.getElementById('material-form-box').style.display = 'none';
+    showCMSMsg('material-msg', '✓ Saved.', 'ok');
+    loadMaterials();
+  } catch (err) { showCMSMsg('material-msg', 'Error: ' + err.message, 'err'); }
+});
+
+async function deleteMaterial(id) {
+  const m = materialsCache.find(x => x.id === id);
+  if (!confirm(`Delete "${m?.title || 'this material'}"? This cannot be undone.`)) return;
+  try {
+    await deleteDoc(doc(db, 'materials', id));
+    loadMaterials();
+  } catch (err) { alert('Error deleting: ' + err.message); }
+}
+
 // Exposed so the classic <script> tab-switcher above can trigger a refresh when this tab opens
 window.initFamiliesTab = function () {
-  if (fbAuth.currentUser) renderFamilyList();
+  if (fbAuth.currentUser) { renderFamilyList(); loadMaterials(); }
 };
 </script>
 

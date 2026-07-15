@@ -4,6 +4,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* ── Feature flag: Parent Portal paused ─────────────────────
+     Flip to true (and unpause docs/portal/index.html's own flag)
+     to bring the portal link back into the nav and footer. ── */
+  const PORTAL_ENABLED = false;
+  if (!PORTAL_ENABLED) {
+    document.querySelectorAll('a[href="/portal/"]').forEach((link) => {
+      link.closest('li')?.remove();
+    });
+  }
+
   /* ── Nav Dropdowns ──────────────────────────────────────── */
   const navDropdowns = ['shopDropdown', 'servicesDropdown']
     .map(id => document.getElementById(id))

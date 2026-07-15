@@ -102,14 +102,24 @@
 <!-- ═══════════════════════════════════════════ PAGE HEADER -->
 <div class="page-header">
   <h1>Parent Portal</h1>
-  <p>Sign in with the Google account you gave us to view your child's baseline and progress reports.</p>
+  <p id="portal-header-sub">Sign in with the Google account you gave us to view your child's baseline and progress reports.</p>
 </div>
 
 <!-- ═══════════════════════════════════════════ PORTAL -->
 <section class="portal-section">
 
+  <!-- Paused (shown while the portal is temporarily disabled) -->
+  <div id="portal-paused" class="portal-gate hidden">
+    <div class="portal-gate__icon">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 3a10 10 0 100 20 10 10 0 000-20z" stroke="currentColor" stroke-width="1.6"/><path d="M13 8v5l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Parent Portal — Coming Soon</h2>
+    <p>We're putting the finishing touches on the parent portal. Please check back soon, or get in touch if you need something in the meantime.</p>
+    <a href="/contact/" class="btn btn--primary" style="justify-content:center;">Contact Us</a>
+  </div>
+
   <!-- Signed out -->
-  <div id="portal-signedout" class="portal-gate">
+  <div id="portal-signedout" class="portal-gate hidden">
     <div class="portal-gate__icon">
       <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 3a10 10 0 100 20 10 10 0 000-20z" stroke="currentColor" stroke-width="1.6"/><path d="M13 8v5l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -203,9 +213,14 @@ const firebaseConfig = {
   appId: "1:41664410632:web:486878dd59406e20cccdbd"
 };
 
-const fbApp = initializeApp(firebaseConfig);
-const fbAuth = getAuth(fbApp);
-const db = getFirestore(fbApp);
+// Flip to true (and main.js's PORTAL_ENABLED flag) to relaunch the portal.
+const PORTAL_ENABLED = false;
+
+if (!PORTAL_ENABLED) {
+  document.getElementById('portal-paused').classList.remove('hidden');
+  document.getElementById('portal-header-sub').textContent =
+    "We're getting this feature ready — check back soon.";
+}
 
 const signedOutEl = document.getElementById('portal-signedout');
 const emptyEl = document.getElementById('portal-empty');
@@ -217,39 +232,59 @@ function showPortalState(state) {
   recordsEl.classList.toggle('hidden', state !== 'records');
 }
 
-document.getElementById('portal-signin-btn').addEventListener('click', () => {
-  signInWithPopup(fbAuth, new GoogleAuthProvider()).catch((err) => {
-    alert('Sign-in failed: ' + err.message);
+if (PORTAL_ENABLED) {
+  const fbApp = initializeApp(firebaseConfig);
+  const fbAuth = getAuth(fbApp);
+  const db = getFirestore(fbApp);
+
+  document.getElementById('portal-signin-btn').addEventListener('click', () => {
+    signInWithPopup(fbAuth, new GoogleAuthProvider()).catch((err) => {
+      alert('Sign-in failed: ' + err.message);
+    });
   });
-});
-document.getElementById('portal-signout-btn').addEventListener('click', () => signOut(fbAuth));
-document.getElementById('portal-signout-empty-btn').addEventListener('click', () => signOut(fbAuth));
+  document.getElementById('portal-signout-btn').addEventListener('click', () => signOut(fbAuth));
+  document.getElementById('portal-signout-empty-btn').addEventListener('click', () => signOut(fbAuth));
 
-onAuthStateChanged(fbAuth, async (user) => {
-  if (!user) { showPortalState('signedout'); return; }
-  document.getElementById('portal-signed-in-as').textContent = 'Signed in as ' + user.email;
+  onAuthStateChanged(fbAuth, async (user) => {
+    if (!user) { showPortalState('signedout'); return; }
+    document.getElementById('portal-signed-in-as').textContent = 'Signed in as ' + user.email;
 
-  try {
-    const q = query(collection(db, 'children'), where('authorizedEmails', 'array-contains', user.email));
-    const snap = await getDocs(q);
-    const children = [];
-    snap.forEach(d => { const data = d.data(); if (data.active) children.push({ id: d.id, ...data }); });
+    try {
+      const q = query(collection(db, 'children'), where('authorizedEmails', 'array-contains', user.email));
+      const snap = await getDocs(q);
+      const children = [];
+      snap.forEach(d => { const data = d.data(); if (data.active) children.push({ id: d.id, ...data }); });
 
-    if (!children.length) { showPortalState('empty'); return; }
+      if (!children.length) { showPortalState('empty'); return; }
 
-    await Promise.all(children.map(async (c) => {
-      const pSnap = await getDocs(query(collection(db, 'children', c.id, 'progress'), orderBy('date', 'desc')));
-      c.progress = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }));
+      await Promise.all(children.map(async (c) => {
+        const pSnap = await getDocs(query(collection(db, 'children', c.id, 'progress'), orderBy('date', 'desc')));
+        c.progress = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const sSnap = await getDocs(query(collection(db, 'children', c.id, 'sessions'), orderBy('date', 'desc')));
+        c.sessions = sSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }));
 
-    renderChildren(children);
-    showPortalState('records');
-  } catch (err) {
-    showPortalState('empty');
-    document.getElementById('portal-empty').querySelector('p').textContent =
-      "We couldn't load your records right now (" + err.message + "). Please try again or contact us.";
-  }
-});
+      let allMaterials = [];
+      try {
+        const mSnap = await getDocs(collection(db, 'materials'));
+        allMaterials = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch (err) {
+        // Materials are a nice-to-have on this page; don't block baseline/progress/sessions on a failure here.
+        console.warn('Could not load materials', err);
+      }
+      children.forEach(c => {
+        c.materials = allMaterials.filter(m => m.isGlobal || (m.assignedChildIds || []).includes(c.id));
+      });
+
+      renderChildren(children);
+      showPortalState('records');
+    } catch (err) {
+      showPortalState('empty');
+      document.getElementById('portal-empty').querySelector('p').textContent =
+        "We couldn't load your records right now (" + err.message + "). Please try again or contact us.";
+    }
+  });
+}
 
 function formatDateLong(dateStr) {
   const parts = dateStr.split('-').map(Number);
@@ -284,8 +319,11 @@ function renderChildren(children) {
   fileLookup = {};
   list.innerHTML = children.map(c => {
     const progress = [...(c.progress || [])].sort((a, b) => b.date.localeCompare(a.date));
+    const sessions = [...(c.sessions || [])].sort((a, b) => b.date.localeCompare(a.date));
+    const materials = c.materials || [];
     if (c.baseline && c.baseline.fileData) fileLookup[c.id + '-baseline'] = c.baseline;
     progress.forEach(p => { if (p.fileData) fileLookup[c.id + '-' + p.id] = p; });
+    materials.forEach(m => { if (m.fileData) fileLookup[c.id + '-material-' + m.id] = m; });
 
     return `
     <div class="child-card">
@@ -299,6 +337,14 @@ function renderChildren(children) {
         </div>
       ` : `<p style="font-size:0.9rem;color:var(--text-muted);">Not yet available.</p>`}
 
+      <div class="child-card__section-label">Sessions</div>
+      ${sessions.length ? sessions.map(s => `
+        <div class="progress-item">
+          <div class="progress-item__date">${formatDateLong(s.date)}${s.durationMinutes ? ' · ' + s.durationMinutes + ' min' : ''}</div>
+          <p>${s.subject || 'Session'}${s.notes ? ' — ' + s.notes : ''}</p>
+        </div>
+      `).join('') : `<p style="font-size:0.9rem;color:var(--text-muted);">No sessions logged yet.</p>`}
+
       <div class="child-card__section-label">Progress</div>
       ${progress.length ? progress.map(p => `
         <div class="progress-item">
@@ -307,6 +353,14 @@ function renderChildren(children) {
           ${p.fileName ? `<button class="btn btn--outline btn--sm file-btn" data-key="${c.id}-${p.id}">View Report</button>` : ''}
         </div>
       `).join('') : `<p style="font-size:0.9rem;color:var(--text-muted);">No progress entries yet.</p>`}
+
+      <div class="child-card__section-label">Materials</div>
+      ${materials.length ? materials.map(m => `
+        <div class="progress-item">
+          <p>${m.title}${m.subject ? ' (' + m.subject + ')' : ''}</p>
+          ${m.fileName ? `<button class="btn btn--outline btn--sm file-btn" data-key="${c.id}-material-${m.id}">Download</button>` : ''}
+        </div>
+      `).join('') : `<p style="font-size:0.9rem;color:var(--text-muted);">No materials shared yet.</p>`}
     </div>`;
   }).join('');
 
